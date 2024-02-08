@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chalo Kisaan Agrotourism Planner</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+<link rel="stylesheet" href="../static/styles.css">
+</head>
+<body>
+<div class="container mx-auto px-4">
+    <nav class="flex justify-between items-center py-6">
+        <a href="#" class="text-2xl font-bold text-gray-800">Chalo Kisaan</a>
+        <div class="menu-toggle" onclick="toggleMenu()">
+          <i class="fas fa-bars fa-2x"></i>
+        </div>
+        <div class="nav-links">
+          <a href="/generate" class="text-gray-600 mx-2">Start Planning</a>
+          <a href="#" class="text-gray-600 mx-2">Explore Farms</a>
+          <a href="#" class="text-blue-600 mx-2">Sign In</a>
+        </div>
+    </nav>
+
+  <section>
+    <header class="text-center py-10">
+        <h1 class="text-5xl font-bold text-gray-800 mb-4">Discover Agrotourism With Us</h1>
+        <p class="text-xl text-gray-600 mb-4">Embark on a unique journey with Chalo Kisaan Agrotourism Planner. Connect with the roots of local agriculture, experience farm life, and indulge in the freshest farm-to-table meals. Our platform tailors your visit to local farms, ensuring an enriching and authentic experience.</p>
+        <a href="/generate" class="start-planning-btn">Start Planning</a>
+    </header>
+
+  <section class="flex flex-col md:flex-row justify-between items-center py-10">
+      <div class="w-full md:w-1/2 mb-4 md:mb-0">
+          <img src="https://placehold.co/600x400" alt="Illustration of a farm scene with various agricultural activities, representing agrotourism experiences." class="mx-auto">
+      </div>
+      <div class="w-full md:w-1/2">
+          <h2 class="text-4xl font-bold text-gray-800 mb-4">Potential Agrotourism Service Prediction</h2>
+          <p class="text-xl text-gray-600">Utilize our advanced prediction tools to discover the best-suited agrotourism services for your land. Based on factors like land size, surrounding biodiversity, budget, and available infrastructure, we help you carve a niche in the agrotourism market.</p>
+      </div>
+  </section>
+
+  <!-- Additional Sections Start Here -->
+
+  <!-- Section 2: Potential Agrotourism Service Prediction -->
+  <section class="flex flex-col md:flex-row justify-between items-center py-10">
+      <div class="w-full md:w-1/2 order-2 md:order-1">
+          <h2 class="text-4xl font-bold text-gray-800 mb-4">Image Generator for Farm Services</h2>
+          <p class="text-xl text-gray-600">After selecting a service, our image generator tool helps visualize its implementation on your actual farm. This innovative feature allows farmers to see potential changes and enhancements to their property, ensuring better planning and execution.</p>
+      </div>
+      <div class="w-full md:w-1/2 mb-4 md:mb-0 order-1 md:order-2">
+          <img src="https://placehold.co/600x400" alt="Potential Agrotourism Service Prediction" class="mx-auto">
+      </div>
+  </section>
+
+  <!-- Section 3: Image Generator -->
+  <section class="flex flex-col md:flex-row justify-between items-center py-10">
+      <div class="w-full md:w-1/2 mb-4 md:mb-0">
+          <img src="https://placehold.co/600x400" alt="Image Generator Visualization" class="mx-auto">
+      </div>
+      <div class="w-full md:w-1/2">
+          <h2 class="text-4xl font-bold text-gray-800 mb-4">Comprehensive Business Model and Planning Tools</h2>
+          <p class="text-xl text-gray-600">Our platform offers a detailed business model, setup process guidelines, and an itinerary generator, complemented by a chatbot for instant assistance. These tools are designed to streamline your venture into agrotourism, from conceptualization to realization.</p>
+      </div>
+  </section>
+
+  <section>
+    <div class="container mx-auto px-4 py-12">
+        <div class="text-center">
+          <h2 class="text-4xl font-bold text-gray-800 mb-6">Your Agrotourism Journey Begins Here</h2>
+          <p class="text-xl text-gray-600 mb-12">Transform your farm into a thriving agrotourism destination with our tailored recommendations, visualization tools, and comprehensive support.</p>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div class="text-center px-4">
+            <div class="mb-4"><i class="fas fa-seedling text-green-500 text-3xl"></i></div>
+            <h3 class="text-2xl font-semibold text-gray-800 mb-2">Best Suitable Service Prediction</h3>
+            <p class="text-gray-600">Discover the most compatible agrotourism service for your farm based on land analysis, local trends, and sustainability practices.</p>
+          </div>
+          <div class="text-center px-4">
+            <div class="mb-4"><i class="fas fa-eye text-blue-500 text-3xl"></i></div>
+            <h3 class="text-2xl font-semibold text-gray-800 mb-2">Visualize Service on Your Farm</h3>
+            <p class="text-gray-600">Leverage our visualization tools to see how different services will look on your farm, helping you make informed decisions.</p>
+          </div>
+          <div class="text-center px-4">
+            <div class="mb-4"><i class="fas fa-robot text-purple-500 text-3xl"></i></div>
+            <h3 class="text-2xl font-semibold text-gray-800 mb-2">Comprehensive Service Building Details</h3>
+            <p class="text-gray-600">Get step-by-step guidance on implementing your chosen service, from planning to execution, all supported by our interactive chatbot.</p>
+          </div>
+        </div>
+    </div>
+
+  </section>
+
+</div>
+
+<script>
+  function toggleMenu() {
+    var navigation = document.querySelector('.nav-links');
+    navigation.classList.toggle('mobile-menu');
+  }
+</script>
+</body>
+</html>

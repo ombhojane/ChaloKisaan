@@ -1,0 +1,54 @@
+body {
+    font-family: 'Open Sans', sans-serif;
+    background-color: white; /* White background */
+    color: #000; /* Black text */
+  }
+  .menu-toggle {
+    display: none; /* Hide menu toggle by default */
+  }
+  .nav-links {
+    display: flex; /* Ensure links are displayed in a row in desktop */
+  }
+  @media (max-width: 768px) {
+    .menu-toggle {
+      display: block; /* Show menu icon in mobile */
+    }
+    .nav-links {
+      display: none; /* Hide navigation links by default in mobile */
+      flex-direction: column; /* Stack links vertically when displayed */
+      position: absolute;
+      width: 100%;
+      top: 60px;
+      left: 0;
+      background: white;
+      text-align: center;
+      padding: 10px 0;
+    }
+    .nav-links.mobile-menu {
+      display: flex; /* Show navigation links when menu is toggled */
+    }
+  }
+  .highlight {
+    color: #6a994e; /* Green for highlight */
+  }
+  .light-chocolate {
+    color: #a56539; /* Light chocolatety color */
+  }
+  .section-description {
+    max-width: 90%; /* Less wider descriptions */
+    margin: auto;
+  }
+  .start-planning-btn {
+      display: inline-block;
+      background-color: #9AE6B4; /* Light green background */
+      color: #2D3748; /* Text color - Dark gray */
+      padding: 10px 20px; /* Button padding */
+      border-radius: 5px; /* Rounded corners */
+      text-decoration: none; /* Remove underline from link */
+      font-weight: 600; /* Bold font weight */
+      transition: background-color 0.3s ease; /* Smooth transition for hover effect */
+  }
+
+  .start-planning-btn:hover {
+      background-color: #81E6D9; /* Slightly darker green on hover for visual feedback */
+  }
