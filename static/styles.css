@@ -1,54 +1,72 @@
 body {
-    font-family: 'Open Sans', sans-serif;
-    background-color: white; /* White background */
-    color: #000; /* Black text */
-  }
+  font-family: 'Open Sans', sans-serif;
+  background-color: white; /* White background */
+  color: #000; /* Black text */
+}
+
+.menu-toggle {
+  cursor: pointer; /* Make it clear it's clickable */
+  display: none; /* Hide menu toggle by default */
+}
+
+.nav-links {
+  display: flex; /* Ensure links are displayed in a row on desktop */
+  align-items: center; /* Center links vertically */
+  gap: 10px; /* Add some space between links */
+}
+
+@media (max-width: 768px) {
   .menu-toggle {
-    display: none; /* Hide menu toggle by default */
+      display: block; /* Show menu icon in mobile */
   }
   .nav-links {
-    display: flex; /* Ensure links are displayed in a row in desktop */
-  }
-  @media (max-width: 768px) {
-    .menu-toggle {
-      display: block; /* Show menu icon in mobile */
-    }
-    .nav-links {
       display: none; /* Hide navigation links by default in mobile */
       flex-direction: column; /* Stack links vertically when displayed */
-      position: absolute;
-      width: 100%;
-      top: 60px;
+      position: fixed; /* Use fixed to cover the screen without scrolling */
+      width: 100%; /* Full width */
+      top: 60px; /* Position below the nav bar */
       left: 0;
-      background: white;
+      background: #f9f9f9; /* Light background for the dropdown */
       text-align: center;
-      padding: 10px 0;
-    }
-    .nav-links.mobile-menu {
+      padding: 20px 0;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1); /* Add shadow for depth */
+      border-top: 2px solid #dddddd; /* Add a border top for a slight separation */
+      z-index: 1000; /* Ensure dropdown is above other content */
+  }
+  .nav-links.mobile-menu {
       display: flex; /* Show navigation links when menu is toggled */
-    }
   }
-  .highlight {
-    color: #6a994e; /* Green for highlight */
+  .nav-links a {
+      padding: 10px; /* Add more padding for touch targets */
+      margin: 5px 0; /* Add some margin between links */
+      font-size: 18px; /* Increase font size for better readability */
   }
-  .light-chocolate {
-    color: #a56539; /* Light chocolatety color */
-  }
-  .section-description {
-    max-width: 90%; /* Less wider descriptions */
-    margin: auto;
-  }
-  .start-planning-btn {
-      display: inline-block;
-      background-color: #9AE6B4; /* Light green background */
-      color: #2D3748; /* Text color - Dark gray */
-      padding: 10px 20px; /* Button padding */
-      border-radius: 5px; /* Rounded corners */
-      text-decoration: none; /* Remove underline from link */
-      font-weight: 600; /* Bold font weight */
-      transition: background-color 0.3s ease; /* Smooth transition for hover effect */
-  }
+}
 
-  .start-planning-btn:hover {
-      background-color: #81E6D9; /* Slightly darker green on hover for visual feedback */
-  }
+.highlight {
+  color: #6a994e; /* Green for highlight */
+}
+
+.light-chocolate {
+  color: #a56539; /* Light chocolatety color */
+}
+
+.section-description {
+  max-width: 90%; /* Less wider descriptions */
+  margin: auto;
+}
+
+.start-planning-btn {
+  display: inline-block;
+  background-color: #9AE6B4; /* Light green background */
+  color: #2D3748; /* Text color - Dark gray */
+  padding: 10px 20px; /* Button padding */
+  border-radius: 5px; /* Rounded corners */
+  text-decoration: none; /* Remove underline from link */
+  font-weight: 600; /* Bold font weight */
+  transition: background-color 0.3s ease; /* Smooth transition for hover effect */
+}
+
+.start-planning-btn:hover {
+  background-color: #81E6D9; /* Slightly darker green on hover for visual feedback */
+}
