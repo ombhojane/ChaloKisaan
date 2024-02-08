@@ -6,9 +6,9 @@ app = Flask(__name__)
 def index():
     return render_template('index.html')
 
-@app.route('/generate')
+@app.route('/predict')
 def generate():
-    return render_template('generate.html')
+    return render_template('predict.html')
 
 @app.route('/image')
 def image():
