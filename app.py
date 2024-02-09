@@ -12,36 +12,41 @@ global_service_name = None
 
 # Placeholder function to simulate content generation for agrotourism services
 def generate_description(service_name):
-    global global_service_name
-    if request.method == 'POST':
-        service_name = request.form['service_name']
-        # Update the global variable with the new service name
-        global_service_name = service_name
-        prompt_parts = [
-            f"Please provide the following details about key features and functionality for the {service_name}:\nFull Service Description:\nWhat does the {service_name} specifically provide to customers? Please give a 2-3 sentence summary.\nKey Features:\nWhat are the main features and highlights of the {service_name}? Please list 3-5 key features.\nUser Experience Flow:\nPlease give a brief step-by-step overview of the key stages in the user experience for customers of the {service_name}.\n",
-        ]
+    # Define prompt templates with specific sections
+    prompt_templates = {
+        "Business Model": f"Business Model Description for {service_name}:\nWhat is the business model of {service_name}? Please provide a concise description.",
+        "Setup Process": f"Setup Process for {service_name}:\nPlease describe the setup process for starting {service_name}, including necessary steps and key considerations.",
+        "Budget Itinerary": f"Budget Itinerary for {service_name}:\nOutline a budget itinerary for {service_name}, detailing expected costs and financial planning advice."
+    }
 
-        generation_config = {
+    # Define generation config and safety settings (unchanged)
+    generation_config = {
             "temperature": 0.9,
             "top_p": 1,
             "top_k": 1,
             "max_output_tokens": 2048,
         }
 
-        safety_settings = [
+    safety_settings = [
             {"category": "HARM_CATEGORY_HARASSMENT", "threshold": "BLOCK_MEDIUM_AND_ABOVE"},
             {"category": "HARM_CATEGORY_HATE_SPEECH", "threshold": "BLOCK_MEDIUM_AND_ABOVE"},
             {"category": "HARM_CATEGORY_SEXUALLY_EXPLICIT", "threshold": "BLOCK_MEDIUM_AND_ABOVE"},
             {"category": "HARM_CATEGORY_DANGEROUS_CONTENT", "threshold": "BLOCK_MEDIUM_AND_ABOVE"},
         ]
 
-        model = genai.GenerativeModel(model_name="gemini-pro",
+    model = genai.GenerativeModel(model_name="gemini-pro",
                                       generation_config=generation_config,
                                       safety_settings=safety_settings)
         
-        response = model.generate_content(prompt_parts)
+    
+    responses = {}
+    for section, prompt in prompt_templates.items():
+        response = model.generate_content([prompt])
         clean_response = response.text.replace("**", "")
-        return clean_response
+        responses[section] = clean_response
+    
+    return responses
+
 
 @app.route('/')
 def index():
@@ -55,17 +60,13 @@ def predict():
 
 @app.route('/generate', methods=['GET', 'POST'])
 def generate():
-    # Check if the request method is POST
     if request.method == 'POST':
-        # Get the service name from the form
         service_name = request.form['service_name']
-        # Generate a description for the given service name
         response = generate_description(service_name)
-        # Render the generate.html template with the generated response and service name
         return render_template('generate.html', response=response, service_name=service_name)
     else:
-        # If the request method is GET, just render the generate.html without any response
         return render_template('generate.html', response=None, service_name=None)
+
 
 @app.route('/create')
 def create():

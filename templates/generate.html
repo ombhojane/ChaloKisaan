@@ -13,7 +13,10 @@
     </form>
     {% if response %}
         <h3>Generated Description for "{{ service_name }}":</h3>
-        <p>{{ response|safe }}</p>
+        {% for section, text in response.items() %}
+            <h4>{{ section }}</h4>
+            <p>{{ text }}</p>
+        {% endfor %}
     {% endif %}
 </body>
 </html>
