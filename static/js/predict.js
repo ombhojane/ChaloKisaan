@@ -14,10 +14,10 @@ tailwind.init();
           farmImage.src = 'https://www.wallpaperup.com/uploads/wallpapers/2015/06/13/720738/0c856c888523da6127f5a322edcd8b43.jpg';
           farmImage.classList.remove('hidden');
       } else if (landSize >= 20 && landSize < 25) {
-          farmImage.src = '../assets/extramid.png';
+          farmImage.src = 'https://www.wallpaperup.com/uploads/wallpapeassets\small.pngrs/2015/06/13/720738/0c856c888523da6127f5a322edcd8b43.jpg';
           farmImage.classList.remove('hidden');
       } else if (landSize >= 25) {
-          farmImage.src = '../assets/large.png';
+          farmImage.src = 'https://www.wallpaperup.com/uploads/wallpapeassets\small.pngrs/2015/06/13/720738/0c856c888523da6127f5a322edcd8b43.jpg';
           farmImage.classList.remove('hidden');
       } else {
           farmImage.classList.add('hidden');
