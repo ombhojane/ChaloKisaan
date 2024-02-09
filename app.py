@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request
 import google.generativeai as genai
 import os
+import time
 
 app = Flask(__name__)
 
@@ -44,6 +45,7 @@ def generate_description(service_name):
         response = model.generate_content([prompt])
         clean_response = response.text.replace("**", "")
         responses[section] = clean_response
+        time.sleep(1)
     
     return responses
 
