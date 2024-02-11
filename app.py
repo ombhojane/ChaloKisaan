@@ -1,112 +1,90 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, session
 import google.generativeai as genai
 import os
-import time
-from concurrent.futures import ThreadPoolExecutor, as_completed
 
 app = Flask(__name__)
+app.secret_key = os.urandom(24)  # Necessary for session management
 
 API_KEY = os.getenv('GENAI_API_KEY')
 genai.configure(api_key=API_KEY)
 
-executor = ThreadPoolExecutor(max_workers=3)
+def generate_description(prompt_parts, generation_config, safety_settings):
+    model = genai.GenerativeModel(model_name="gemini-pro",
+                                  generation_config=generation_config,
+                                  safety_settings=safety_settings)
+    response = model.generate_content(prompt_parts)
+    clean_response = response.text.replace("**", "")
+    return clean_response
 
-
-RESPONSE_TIMEOUT = 60  
-
-def check_status(future, section):
-    try:
-        response = future.result(timeout=RESPONSE_TIMEOUT)
-        clean_response = response.text.replace("**", "")
-        return section, clean_response
-    except Exception as e:
-        return section, str(e)  
-
-def generate_description(service_name):
-    prompt_templates = {
-        "Business Model": f"Business Model Description for {service_name}:\nWhat is the business model of {service_name}? Please provide a concise description.",
-        "Setup Process": f"Setup Process for {service_name}:\nPlease describe the setup process for starting {service_name}, including necessary steps and key considerations.",
-        "Budget Itinerary": f"Budget Itinerary for {service_name}:\nOutline a budget itinerary for {service_name}, detailing expected costs and financial planning advice."
-    }
-
-    # Define generation config and safety settings (unchanged)
-    generation_config = {
+def get_generation_config():
+    return {
         "temperature": 0.9,
         "top_p": 1,
         "top_k": 1,
         "max_output_tokens": 2048,
     }
 
-    safety_settings = [
+def get_safety_settings():
+    return [
         {"category": "HARM_CATEGORY_HARASSMENT", "threshold": "BLOCK_MEDIUM_AND_ABOVE"},
         {"category": "HARM_CATEGORY_HATE_SPEECH", "threshold": "BLOCK_MEDIUM_AND_ABOVE"},
         {"category": "HARM_CATEGORY_SEXUALLY_EXPLICIT", "threshold": "BLOCK_MEDIUM_AND_ABOVE"},
         {"category": "HARM_CATEGORY_DANGEROUS_CONTENT", "threshold": "BLOCK_MEDIUM_AND_ABOVE"},
     ]
-    
-    model = genai.GenerativeModel(model_name="gemini-pro",
-                                  generation_config=generation_config,
-                                  safety_settings=safety_settings)
-    
-    future_responses = {section: executor.submit(model.generate_content, [prompt])
-                        for section, prompt in prompt_templates.items()}
-    
-    # A dict to collect the final responses
-    responses = {}
-    
-    try:
-        for future in as_completed(future_responses.values(), timeout=RESPONSE_TIMEOUT):
-            section = None
-            for sec, fut in future_responses.items():
-                if fut == future:
-                    section = sec
-                    break
-            if section:
-                try:
-                    response = future.result()  # We already have a timeout in as_completed
-                    clean_response = response.text.replace("**", "")
-                    responses[section] = clean_response
-                except TimeoutError:
-                    responses[section] = "Timeout occurred while generating content"
-                except Exception as e:
-                    responses[section] = f"An error occurred: {e}"
-    finally:
-        # Cancel any pending futures if they are not done
-        for future in future_responses.values():
-            if not future.done():
-                future.cancel()
-
-        # Shutdown the executor in a clean way
-        executor.shutdown(wait=False)
-
-    return responses
 
 @app.route('/')
 def index():
+    session.clear()  # Clear session at the start
     return render_template('index.html')
-
-@app.route('/predict')
-def predict():
-    # Renders the prediction page
-    return render_template('predict.html')
 
 @app.route('/generate', methods=['GET', 'POST'])
 def generate():
     if request.method == 'POST':
-        service_name = request.form['service_name']
-        try:
-            response = generate_description(service_name)
-            return render_template('generate.html', response=response, service_name=service_name)
-        except TimeoutError as e:
-            # Log the error here
-            print(f"A timeout occurred: {e}")
-            # Return a message to the user or redirect to an error page
-            return render_template('error.html', message="The server took too long to respond.")
+        service_name = session.get('service_name', request.form['service_name'])
+        session['service_name'] = service_name  # Ensure service name is stored in session
+
+        # Initialize or retrieve existing sections from session
+        sections = session.get('sections', [])
+        current_section = request.form.get('section', 'description')
+
+        if 'accept' in request.form:
+            # Determine the next section based on the current section
+            next_section_map = {
+                'description': 'business_model',
+                'business_model': 'setup_process',
+                'setup_process': 'budget',
+                'budget': None  # Indicates end of sections
+            }
+            next_section = next_section_map.get(current_section)
+
+            # If there's a next section, prepare for it; otherwise, keep current state
+            if next_section:
+                sections.append({'name': next_section, 'content': ''})
+                current_section = next_section
+        elif sections and sections[-1]['name'] == current_section:
+            # If regenerating the current section, do not append a new section
+            pass
+        else:
+            # Add current section if it's not the last one or if list is empty
+            sections.append({'name': current_section, 'content': ''})
+
+        prompt_parts = [
+            f"Generate {current_section} for {service_name} in the context of agrotourism."
+        ]
+
+        # Generate content
+        response = generate_description(prompt_parts, get_generation_config(), get_safety_settings())
+        sections[-1]['content'] = response  # Update the content of the current section
+
+        session['sections'] = sections  # Ensure the updated sections list is saved to the session
+
+        return render_template('generate.html', sections=sections, service_name=service_name)
     else:
-        return render_template('generate.html', response=None, service_name=None)
+        # For GET requests, clear previous sections and start fresh
+        session.pop('sections', None)
+        return render_template('generate.html', sections=[], service_name=None)
 
 
-@app.route('/create')
-def create():
-    # Renders the create page (if you have one)
-    return render_template('create.html')
+if __name__ == '__main__':
+    app.run(debug=True)
+

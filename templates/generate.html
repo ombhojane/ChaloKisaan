@@ -2,57 +2,25 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Agrotourism Service Generator</title>
-    <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-gray-100">
-    <div class="flex justify-center px-6 py-12">
-        <div class="w-full max-w-4xl">
-            <div class="bg-white shadow overflow-hidden sm:rounded-lg">
-                <div class="px-4 py-5 sm:px-6">
-                    <h2 class="text-2xl leading-6 font-medium text-gray-900">
-                        Create a Plan
-                    </h2>
-                </div>
-                <div class="border-t border-gray-200">
-                    <dl>
-                        <div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                            <dt class="text-sm font-medium text-gray-500">
-                                Enter the Agrotourism Service Name:
-                            </dt>
-                            <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                                <form method="post" class="flex flex-col space-y-4 md:flex-row md:items-center md:space-y-0 md:space-x-4">
-                                    <div class="flex-grow">
-                                        <input type="text" id="service_name" name="service_name" required 
-                                            class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
-                                    </div>
-                                    <div>
-                                        <button type="submit" 
-                                            class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                                            Create Plan
-                                        </button>
-                                    </div>
-                                </form>
-                            </dd>
-                        </div>
-                        {% if response %}
-                            <div class="px-4 py-5 sm:px-6">
-                                <h3 class="text-lg leading-6 font-medium text-gray-900">
-                                    Generated Description for "{{ service_name }}":
-                                </h3>
-                                <div class="mt-4">
-                                    {% for section, text in response.items() %}
-                                        <h4 class="text-md font-bold text-gray-900">{{ section }}</h4>
-                                        <p class="mt-1 text-sm text-gray-600">{{ text }}</p>
-                                    {% endfor %}
-                                </div>
-                            </div>
-                        {% endif %}
-                    </dl>
-                </div>
-            </div>
-        </div>
-    </div>
+<body>
+    <h2>Agrotourism Service Description Generator</h2>
+    <form method="post">
+        <label for="service_name">Enter the Agrotourism Service Name:</label><br>
+        <input type="text" id="service_name" name="service_name" required value="{{ service_name }}"><br>
+        <input type="submit" value="Start Generation">
+    </form>
+    {% for section in sections %}
+        <h3>Generated {{ section.name.replace('_', ' ').title() }} for {{ service_name }}:</h3>
+        <p>{{ section.content }}</p>
+        <form method="post">
+            <input type="hidden" name="service_name" value="{{ service_name }}">
+            <input type="hidden" name="section" value="{{ section.name }}">
+            <input type="submit" name="accept" value="Yes, loved it!">
+            <input type="submit" name="regenerate" value="Generate Again">
+        </form>
+        
+    {% endfor %}
 </body>
 </html>
