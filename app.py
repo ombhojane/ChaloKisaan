@@ -1,15 +1,15 @@
 from flask import Flask, render_template, request
 import google.generativeai as genai
 import os
-import time
+from concurrent.futures import ThreadPoolExecutor
 
 app = Flask(__name__)
 
 API_KEY = os.getenv('GENAI_API_KEY')
 genai.configure(api_key=API_KEY)
 
-# Initialize a global variable to store the service name
-global_service_name = None
+# Initialize a ThreadPoolExecutor for making asynchronous API calls
+executor = ThreadPoolExecutor(max_workers=3)
 
 # Placeholder function to simulate content generation for agrotourism services
 def generate_description(service_name):
@@ -22,30 +22,35 @@ def generate_description(service_name):
 
     # Define generation config and safety settings (unchanged)
     generation_config = {
-            "temperature": 0.9,
-            "top_p": 1,
-            "top_k": 1,
-            "max_output_tokens": 2048,
-        }
+        "temperature": 0.9,
+        "top_p": 1,
+        "top_k": 1,
+        "max_output_tokens": 2048,
+    }
 
     safety_settings = [
-            {"category": "HARM_CATEGORY_HARASSMENT", "threshold": "BLOCK_MEDIUM_AND_ABOVE"},
-            {"category": "HARM_CATEGORY_HATE_SPEECH", "threshold": "BLOCK_MEDIUM_AND_ABOVE"},
-            {"category": "HARM_CATEGORY_SEXUALLY_EXPLICIT", "threshold": "BLOCK_MEDIUM_AND_ABOVE"},
-            {"category": "HARM_CATEGORY_DANGEROUS_CONTENT", "threshold": "BLOCK_MEDIUM_AND_ABOVE"},
-        ]
+        {"category": "HARM_CATEGORY_HARASSMENT", "threshold": "BLOCK_MEDIUM_AND_ABOVE"},
+        {"category": "HARM_CATEGORY_HATE_SPEECH", "threshold": "BLOCK_MEDIUM_AND_ABOVE"},
+        {"category": "HARM_CATEGORY_SEXUALLY_EXPLICIT", "threshold": "BLOCK_MEDIUM_AND_ABOVE"},
+        {"category": "HARM_CATEGORY_DANGEROUS_CONTENT", "threshold": "BLOCK_MEDIUM_AND_ABOVE"},
+    ]
 
     model = genai.GenerativeModel(model_name="gemini-pro",
-                                      generation_config=generation_config,
-                                      safety_settings=safety_settings)
-        
+                                  generation_config=generation_config,
+                                  safety_settings=safety_settings)
+    
+    # Use a ThreadPoolExecutor to make asynchronous API calls
+    future_responses = {section: executor.submit(model.generate_content, [prompt])
+                        for section, prompt in prompt_templates.items()}
     
     responses = {}
-    for section, prompt in prompt_templates.items():
-        response = model.generate_content([prompt])
-        clean_response = response.text.replace("**", "")
-        responses[section] = clean_response
-        time.sleep(1)
+    for section, future in future_responses.items():
+        try:
+            response = future.result(timeout=10)  # Set a timeout for each API call
+            clean_response = response.text.replace("**", "")
+            responses[section] = clean_response
+        except Exception as e:
+            responses[section] = str(e)  # Handle exceptions such as timeouts
     
     return responses
 
@@ -60,6 +65,7 @@ def predict():
     # Renders the prediction page
     return render_template('predict.html')
 
+
 @app.route('/generate', methods=['GET', 'POST'])
 def generate():
     if request.method == 'POST':
@@ -68,12 +74,13 @@ def generate():
         return render_template('generate.html', response=response, service_name=service_name)
     else:
         return render_template('generate.html', response=None, service_name=None)
-
+    
 
 @app.route('/create')
 def create():
     # Renders the create page (if you have one)
     return render_template('create.html')
+
 
 if __name__ == '__main__':
     app.run(debug=True)
