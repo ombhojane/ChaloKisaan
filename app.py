@@ -11,8 +11,8 @@ genai.configure(api_key=API_KEY)
 
 executor = ThreadPoolExecutor(max_workers=3)
 
-# Define the timeout for waiting for the response
-RESPONSE_TIMEOUT = 60  # in seconds, adjust as needed
+
+RESPONSE_TIMEOUT = 60  
 
 def check_status(future, section):
     try:
@@ -20,7 +20,7 @@ def check_status(future, section):
         clean_response = response.text.replace("**", "")
         return section, clean_response
     except Exception as e:
-        return section, str(e)  # Handle exceptions such as timeouts
+        return section, str(e)  
 
 def generate_description(service_name):
     prompt_templates = {
