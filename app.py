@@ -32,6 +32,20 @@ def get_safety_settings():
         {"category": "HARM_CATEGORY_DANGEROUS_CONTENT", "threshold": "BLOCK_MEDIUM_AND_ABOVE"},
     ]
 
+def format_response(response):
+    # Convert markdown bullet points and bold text to HTML
+    response = response.replace("**", "<strong>").replace("<strong>", "</strong>", 1)  # Bold
+    lines = response.split('\n')
+    formatted_lines = []
+    for line in lines:
+        if line.startswith('- ') or line.isdigit():  # Bullet points or numerical points
+            formatted_lines.append(f"<li>{line[2:] if line.startswith('- ') else line}</li>")
+        else:
+            formatted_lines.append(line)
+    formatted_response = "<ul>" + "\n".join(formatted_lines) + "</ul>" if formatted_lines else response
+    return formatted_response.replace("<ul></ul>", "")  # Remove empty list tags
+
+
 @app.route('/')
 def index():
     session.clear()  # Clear session at the start
@@ -41,48 +55,44 @@ def index():
 def generate():
     if request.method == 'POST':
         service_name = session.get('service_name', request.form['service_name'])
-        session['service_name'] = service_name  # Ensure service name is stored in session
+        session['service_name'] = service_name
 
-        # Initialize or retrieve existing sections from session
         sections = session.get('sections', [])
         current_section = request.form.get('section', 'description')
 
+        is_final_section = False  # Flag to indicate if the current section is the final one
+
         if 'accept' in request.form:
-            # Determine the next section based on the current section
             next_section_map = {
                 'description': 'business_model',
                 'business_model': 'setup_process',
                 'setup_process': 'budget',
-                'budget': None  # Indicates end of sections
+                'budget': 'end'  # Indicates the end of the sections
             }
             next_section = next_section_map.get(current_section)
 
-            # If there's a next section, prepare for it; otherwise, keep current state
-            if next_section:
+            if next_section == 'end':
+                is_final_section = True  # Set the flag when we reach the final section
+            elif next_section:
                 sections.append({'name': next_section, 'content': ''})
                 current_section = next_section
         elif sections and sections[-1]['name'] == current_section:
-            # If regenerating the current section, do not append a new section
             pass
         else:
-            # Add current section if it's not the last one or if list is empty
             sections.append({'name': current_section, 'content': ''})
 
-        prompt_parts = [
-            f"Generate {current_section} for {service_name} in the context of agrotourism."
-        ]
+        prompt_parts = [f"Generate {current_section} for {service_name} in the context of agrotourism."]
 
-        # Generate content
         response = generate_description(prompt_parts, get_generation_config(), get_safety_settings())
-        sections[-1]['content'] = response  # Update the content of the current section
+        formatted_response = format_response(response)  # Apply formatting to the response
+        sections[-1]['content'] = formatted_response
 
-        session['sections'] = sections  # Ensure the updated sections list is saved to the session
+        session['sections'] = sections
 
-        return render_template('generate.html', sections=sections, service_name=service_name)
+        return render_template('generate.html', sections=sections, service_name=service_name, is_final_section=is_final_section)
     else:
-        # For GET requests, clear previous sections and start fresh
-        session.pop('sections', None)
-        return render_template('generate.html', sections=[], service_name=None)
+        session.pop('sections', None)  # Clear session for new start
+        return render_template('generate.html', sections=[], service_name=None, is_final_section=False)
 
 
 if __name__ == '__main__':

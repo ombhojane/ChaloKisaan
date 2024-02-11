@@ -2,25 +2,39 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Agrotourism Service Generator</title>
+    <!-- Include Tailwind CSS from CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
 </head>
-<body>
-    <h2>Agrotourism Service Description Generator</h2>
-    <form method="post">
-        <label for="service_name">Enter the Agrotourism Service Name:</label><br>
-        <input type="text" id="service_name" name="service_name" required value="{{ service_name }}"><br>
-        <input type="submit" value="Start Generation">
-    </form>
-    {% for section in sections %}
-        <h3>Generated {{ section.name.replace('_', ' ').title() }} for {{ service_name }}:</h3>
-        <p>{{ section.content }}</p>
-        <form method="post">
-            <input type="hidden" name="service_name" value="{{ service_name }}">
-            <input type="hidden" name="section" value="{{ section.name }}">
-            <input type="submit" name="accept" value="Yes, loved it!">
-            <input type="submit" name="regenerate" value="Generate Again">
+<body class="bg-gray-50 text-gray-800">
+    <div class="container mx-auto px-4 py-8">
+        <h2 class="text-xl font-bold text-green-600">Agrotourism Service Description Generator</h2>
+        <form method="post" class="mt-4">
+            <label for="service_name" class="block text-gray-700 text-sm font-bold mb-2">Enter the Agrotourism Service Name:</label>
+            <input type="text" id="service_name" name="service_name" required value="{{ service_name }}" class="shadow appearance-none border rounded py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline w-full">
+            <input type="submit" value="Start Generation" class="mt-4 bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline cursor-pointer">
         </form>
-        
-    {% endfor %}
+        {% if sections %}
+            <div class="mt-8">
+                {% for section in sections %}
+                    <div class="mb-8 p-4 shadow-lg rounded-lg bg-white">
+                        <h3 class="font-bold text-green-600">Generated {{ section.name.replace('_', ' ').title() }} for {{ service_name }}:</h3>
+                        <div class="mt-2 text-gray-600">{{ section.content | safe }}</div>
+                    </div>
+                {% endfor %}
+                {% if not is_final_section %}
+                    <form method="post" class="flex justify-between items-center mt-4">
+                        <input type="hidden" name="service_name" value="{{ service_name }}">
+                        <input type="hidden" name="section" value="{{ sections[-1].name }}">
+                        <input type="submit" name="accept" value="Yes, loved it!" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline cursor-pointer">
+                        <input type="submit" name="regenerate" value="Generate Again" class="ml-2 bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline cursor-pointer">
+                    </form>
+                {% else %}
+                    <p class="mt-4 text-green-600">Thank you for using our service!</p>
+                {% endif %}
+            </div>
+        {% endif %}
+    </div>
 </body>
 </html>
