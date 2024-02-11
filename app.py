@@ -54,13 +54,31 @@ def generate_description(service_name):
     # A dict to collect the final responses
     responses = {}
     
-    # Wait for the responses using as_completed
-    for future in as_completed(future_responses.values(), timeout=RESPONSE_TIMEOUT):
-        for section, future in future_responses.items():
-            if future.done():
-                section, result = check_status(future, section)
-                responses[section] = result
-    
+    try:
+        for future in as_completed(future_responses.values(), timeout=RESPONSE_TIMEOUT):
+            section = None
+            for sec, fut in future_responses.items():
+                if fut == future:
+                    section = sec
+                    break
+            if section:
+                try:
+                    response = future.result()  # We already have a timeout in as_completed
+                    clean_response = response.text.replace("**", "")
+                    responses[section] = clean_response
+                except TimeoutError:
+                    responses[section] = "Timeout occurred while generating content"
+                except Exception as e:
+                    responses[section] = f"An error occurred: {e}"
+    finally:
+        # Cancel any pending futures if they are not done
+        for future in future_responses.values():
+            if not future.done():
+                future.cancel()
+
+        # Shutdown the executor in a clean way
+        executor.shutdown(wait=False)
+
     return responses
 
 @app.route('/')
@@ -76,12 +94,17 @@ def predict():
 def generate():
     if request.method == 'POST':
         service_name = request.form['service_name']
-        response = generate_description(service_name)
-        # Ensure all threads have completed
-        executor.shutdown(wait=True)
-        return render_template('generate.html', response=response, service_name=service_name)
+        try:
+            response = generate_description(service_name)
+            return render_template('generate.html', response=response, service_name=service_name)
+        except TimeoutError as e:
+            # Log the error here
+            print(f"A timeout occurred: {e}")
+            # Return a message to the user or redirect to an error page
+            return render_template('error.html', message="The server took too long to respond.")
     else:
         return render_template('generate.html', response=None, service_name=None)
+
 
 @app.route('/create')
 def create():
