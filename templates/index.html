@@ -8,27 +8,74 @@
 <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
 <link rel="stylesheet" href="../static/styles.css">
+<style>
+  /* Custom styles for broader hero section and minimal footer */
+  .hero-section {
+    padding: 40px 0; /* Increase padding for a broader look */
+    background-color: #f0f9ff; /* Light green background */
+    color: #333; /* Adjust text color for better contrast */
+  }
+  .footer {
+    background-color: #f0f9ff; /* Footer background to match the theme */
+    color: #333; /* Footer text color */
+    padding: 20px 0;
+    text-align: center;
+  }
+</style>
 </head>
 <body>
-<div class="container mx-auto px-4">
+  <div class="container mx-auto px-4">
     <nav class="flex justify-between items-center py-6">
-        <a href="#" class="text-2xl font-bold text-gray-800">Chalo Kisaan</a>
-        <div class="menu-toggle" onclick="toggleMenu()">
-          <i class="fas fa-bars fa-2x"></i>
-        </div>
-        <div class="nav-links">
-          <a href="/predict" class="text-gray-600 mx-2">Start Planning</a>
-          <a href="/generate" class="text-gray-600 mx-2">Generate</a>
-          <a href="#" class="text-blue-600 mx-2">Sign In</a>
-        </div>
+      <a href="#" class="text-2xl font-bold text-gray-800">Chalo Kisaan</a>
+      <div class="menu-toggle" onclick="toggleMenu()">
+        <i class="fas fa-bars fa-2x"></i>
+      </div>
+      <div class="nav-links hidden md:flex">
+        <a href="/predict" class="text-gray-600 mx-2">Start Planning</a>
+        <a href="/generate" class="text-gray-600 mx-2">Generate</a>
+        <a href="#" class="text-blue-600 mx-2">How it works?</a>
+      </div>
     </nav>
 
-  <section>
-    <header class="text-center py-10">
-        <h1 class="text-5xl font-bold text-gray-800 mb-4">Discover Agrotourism With Us</h1>
-        <p class="text-xl text-gray-600 mb-4">Embark on a unique journey with Chalo Kisaan Agrotourism Planner. Connect with the roots of local agriculture, experience farm life, and indulge in the freshest farm-to-table meals. Our platform tailors your visit to local farms, ensuring an enriching and authentic experience.</p>
-        <a href="/predict" class="start-planning-btn">Start Planning</a>
-    </header>
+    <!-- Hero Banner with Value Proposition -->
+    <div class="hero-section text-center py-20 bg-green-50">
+      <h1 class="text-5xl font-bold">Generate the optimal agrotourism plan for your farm with AI</h1>
+      <p class="text-xl mt-4">Empower your farm's potential with cutting-edge AI technology.</p>
+    </div>
+
+  <!-- Section: Vibrant Images of Farms -->
+  <!-- Section: Before and After Image Generator Examples -->
+<section class="py-10">
+  <h2 class="text-3xl font-bold text-gray-800 text-center mb-6">Image Generator for Farm Services</h2>
+  <p class="text-xl text-gray-600 text-center mb-6">See the transformation your farm can undergo with our Image Generator. Compare the original farm state with the envisioned service implemented.</p>
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <!-- Before Image -->
+      <div class="text-center">
+          <p class="text-lg text-gray-800 mb-2">Original Farm</p>
+          <img src="https://media.dev.to/cdn-cgi/image/width=800%2Cheight=%2Cfit=scale-down%2Cgravity=auto%2Cformat=auto/https%3A%2F%2Fdev-to-uploads.s3.amazonaws.com%2Fuploads%2Farticles%2Fpr5b01cr48vdvck3k20r.png" alt="Original Farm" class="mx-auto shadow-lg rounded-lg">
+      </div>
+      <!-- After Image -->
+      <div class="text-center">
+          <p class="text-lg text-gray-800 mb-2">Farm with Service Implemented</p>
+          <img src="https://media.dev.to/cdn-cgi/image/width=800%2Cheight=%2Cfit=scale-down%2Cgravity=auto%2Cformat=auto/https%3A%2F%2Fdev-to-uploads.s3.amazonaws.com%2Fuploads%2Farticles%2Fpr5b01cr48vdvck3k20r.png" alt="Farm with Service Implemented" class="mx-auto shadow-lg rounded-lg">
+      </div>
+  </div>
+</section>
+
+
+  <!-- Section: Video Explainer -->
+  <section class="py-10">
+      <h2 class="text-3xl font-bold text-gray-800 text-center mb-6">How It Works</h2>
+      <div class="flex justify-center">
+          <video controls width="70%">
+              <source src="path/to/your-video.mp4" type="video/mp4">
+              Sorry, your browser doesn't support embedded videos.
+          </video>
+      </div>
+  </section>
+
+  <h2 class="text-4xl font-bold text-gray-800 text-center my-10">Features</h2>
+
 
   <section class="flex flex-col md:flex-row justify-between items-center py-10">
       <div class="w-full md:w-1/2 mb-4 md:mb-0">
@@ -90,6 +137,9 @@
     </div>
 
   </section>
+  <footer class="footer bg-green-50">
+    <p class="text-gray-800">&copy; 2024 Chalo Kisaan. All rights reserved.</p>
+  </footer>
 
 </div>
 
