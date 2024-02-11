@@ -4,10 +4,25 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Agrotourism Service Generator</title>
-    <!-- Include Tailwind CSS from CDN -->
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <link rel="stylesheet" href="../static/styles.css">
+
 </head>
 <body class="bg-gray-50 text-gray-800">
+    <nav class="flex justify-between items-center py-6">
+        <a href="#" class="text-2xl font-bold text-gray-800">Chalo Kisaan</a>
+        <div class="menu-toggle" onclick="toggleMenu()">
+          <i class="fas fa-bars fa-2x"></i>
+        </div>
+        <div class="nav-links hidden md:flex">
+          <a href="/predict" class="text-gray-600 mx-2">Start Planning</a>
+          <a href="/generate" class="text-gray-600 mx-2">Generate</a>
+          <a href="#" class="text-blue-600 mx-2">How it works?</a>
+        </div>
+      </nav>
+
     <div class="container mx-auto px-4 py-8">
         <h2 class="text-xl font-bold text-green-600">Agrotourism Service Description Generator</h2>
         <form method="post" class="mt-4">
@@ -36,5 +51,11 @@
             </div>
         {% endif %}
     </div>
+    <script>
+        function toggleMenu() {
+          var navigation = document.querySelector('.nav-links');
+          navigation.classList.toggle('mobile-menu');
+        }
+      </script>
 </body>
 </html>

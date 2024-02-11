@@ -51,6 +51,11 @@ def index():
     session.clear()  # Clear session at the start
     return render_template('index.html')
 
+@app.route('/predict')
+def pedict():
+    session.clear()  # Clear session at the start
+    return render_template('predict.html')
+
 @app.route('/generate', methods=['GET', 'POST'])
 def generate():
     if request.method == 'POST':
