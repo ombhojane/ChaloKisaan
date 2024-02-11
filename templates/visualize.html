@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Image Generation</title>
+</head>
+<body>
+    <h2>Image Generation Form</h2>
+    <form id="generateForm" enctype="multipart/form-data">
+        <input type="file" id="image" name="image" required>
+        <button type="submit">Generate Image</button>
+    </form>
+    <h3>Generated Image:</h3>
+    <img id="outputImage" src="" alt="Generated Image" style="max-width: 500px;">
+
+    <script>
+        document.getElementById('generateForm').addEventListener('submit', function(e) {
+            e.preventDefault(); // Prevent the default form submission
+            
+            const formData = new FormData();
+            const imageInput = document.getElementById('image');
+            if (imageInput.files.length > 0) {
+                formData.append('image', imageInput.files[0]);
+            }
+
+            fetch('/generate-image', {
+                method: 'POST',
+                body: formData,
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('outputImage').src = data.generatedImageUrl;
+            })
+            .catch(error => console.error('Error:', error));
+        });
+    </script>
+</body>
+</html>

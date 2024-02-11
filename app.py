@@ -1,6 +1,12 @@
 from flask import Flask, render_template, request, session
 import google.generativeai as genai
 import os
+# import torch
+# from PIL import Image
+# import numpy as np
+# from flask import jsonify, send_from_directory
+# from werkzeug.utils import secure_filename
+
 
 app = Flask(__name__)
 app.secret_key = os.urandom(24)  # Necessary for session management
@@ -45,6 +51,78 @@ def format_response(response):
     formatted_response = "<ul>" + "\n".join(formatted_lines) + "</ul>" if formatted_lines else response
     return formatted_response.replace("<ul></ul>", "")  # Remove empty list tags
 
+# adding visualiztions
+
+# device = "cuda" if torch.cuda.is_available() else "cpu"
+
+# UPLOAD_FOLDER = 'uploads'
+# GENERATED_FOLDER = 'generated'
+# app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+# app.config['GENERATED_FOLDER'] = GENERATED_FOLDER
+
+# os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+# os.makedirs(GENERATED_FOLDER, exist_ok=True)
+
+# def generate_image_with_ml_model(image_path, prompt):
+#     # Load the image
+#     input_image = load_image(image_path).to(device)
+
+#     # Initialize the depth estimator
+#     depth_estimator = pipeline("depth-estimation", device=device)
+    
+#     # Process to obtain depth map
+#     depth_map = get_depth_map(input_image, depth_estimator)  # Assuming get_depth_map is defined similarly to your Colab code
+
+#     # Initialize the ControlNet model and pipeline
+#     controlnet = ControlNetModel.from_pretrained("lllyasviel/sd-controlnet-normal", torch_dtype=torch.float16, use_safetensors=True).to(device)
+#     pipe = StableDiffusionControlNetImg2ImgPipeline.from_pretrained(
+#         "runwayml/stable-diffusion-v1-5",
+#         controlnet=controlnet,
+#         torch_dtype=torch.float16,
+#         use_safetensors=True
+#     ).to(device)
+#     pipe.scheduler = UniPCMultistepScheduler.from_config(pipe.scheduler.config)
+#     pipe.enable_model_cpu_offload()
+
+#     # Generate the image
+#     output = pipe(prompt=prompt, image=input_image, control_image=depth_map).images[0]
+
+#     # Convert tensor to PIL Image for saving
+#     output_image = Image.fromarray(output.mul(255).clamp(0, 255).byte().cpu().numpy().astype(np.uint8).transpose(1, 2, 0))
+    
+#     return output_image
+
+# @app.route('/generate-image', methods=['POST'])
+# def generate_image_endpoint():
+#     if 'image' not in request.files:
+#         return jsonify({'error': 'No image part'}), 400
+#     file = request.files['image']
+#     prompt = request.form.get('prompt', '')  # Get the prompt from the form data
+#     if file.filename == '':
+#         return jsonify({'error': 'No selected file'}), 400
+#     if file and prompt:
+#         filename = secure_filename(file.filename)
+#         input_filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+#         file.save(input_filepath)
+        
+#         # Generate the image
+#         output_image = generate_image_with_ml_model(input_filepath, prompt)
+#         output_filename = f"generated_{filename}"
+#         output_filepath = os.path.join(app.config['GENERATED_FOLDER'], output_filename)
+#         output_image.save(output_filepath)
+        
+#         return jsonify({'generatedImageUrl': f'/generated/{output_filename}'})
+#     else:
+#         return jsonify({'error': 'Invalid request'}), 400
+
+# @app.route('/generated/<filename>')
+# def generated_image(filename):
+#     return send_from_directory(app.config['GENERATED_FOLDER'], filename)
+
+
+@app.route('/visualize')
+def visualize():
+    return render_template('visualize.html')
 
 @app.route('/')
 def index():

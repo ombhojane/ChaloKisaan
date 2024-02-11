@@ -8,16 +8,16 @@ tailwind.init();
       var farmImage = document.getElementById('farmImage');
 
       if (landSize >= 1 && landSize < 10) {
-          farmImage.src = 'https://raw.githubusercontent.com/ombhojane/letschalokisaanai/main/assets/small.png?token=GHSAT0AAAAAACLEWSAUXKUNPOKOU7YRSYYQZOJFMJQ';
+          farmImage.src = 'https://github.com/ombhojane/chalokisaanai/blob/main/assets/small.png?raw=true';
           farmImage.classList.remove('hidden');
       } else if (landSize >= 10 && landSize < 20) {
-          farmImage.src = 'https://raw.githubusercontent.com/ombhojane/letschalokisaanai/main/assets/mid.png?token=GHSAT0AAAAAACLEWSAUL2LMUOLEMOF2JFM2ZOJFM2A';
+          farmImage.src = 'https://github.com/ombhojane/chalokisaanai/blob/main/assets/mid.png?raw=true';
           farmImage.classList.remove('hidden');
       } else if (landSize >= 20 && landSize < 25) {
-          farmImage.src = 'https://raw.githubusercontent.com/ombhojane/letschalokisaanai/main/assets/extramid.png?token=GHSAT0AAAAAACLEWSAU5U5RT3JIOVNKNZDSZOJFNIA';
+          farmImage.src = 'https://github.com/ombhojane/chalokisaanai/blob/main/assets/large.png?raw=true';
           farmImage.classList.remove('hidden');
       } else if (landSize >= 25) {
-          farmImage.src = 'https://raw.githubusercontent.com/ombhojane/letschalokisaanai/main/assets/large.png?token=GHSAT0AAAAAACLEWSAVVWAAAKGCSNDKOKFUZOJFNUA';
+          farmImage.src = 'https://github.com/ombhojane/chalokisaanai/blob/main/assets/extramid.png?raw=true';
           farmImage.classList.remove('hidden');
       } else {
           farmImage.classList.add('hidden');
