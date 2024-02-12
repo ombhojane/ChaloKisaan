@@ -124,6 +124,10 @@ def format_response(response):
 def visualize():
     return render_template('visualize.html')
 
+@app.route('/docs')
+def docs():
+    return render_template('docs.html')
+
 @app.route('/')
 def index():
     session.clear()  # Clear session at the start
