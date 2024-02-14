@@ -8,7 +8,7 @@ tailwind.init();
       var farmImage = document.getElementById('farmImage');
 
       if (landSize >= 1 && landSize < 10) {
-          farmImage.src = 'https://github.com/ombhojane/chalokisaanai/blob/main/assets/small.png?raw=true';
+          farmImage.src = 'https://i.postimg.cc/RCw9z1Kv/Screenshot-2024-02-14-205114.png';
           farmImage.classList.remove('hidden');
       } else if (landSize >= 10 && landSize < 20) {
           farmImage.src = 'https://github.com/ombhojane/chalokisaanai/blob/main/assets/mid.png?raw=true';

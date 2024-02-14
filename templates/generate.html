@@ -14,6 +14,9 @@
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
     />
     <link rel="stylesheet" href="../static/styles.css" />
+    
+    <link rel="stylesheet" href="../static/predict.css" /> 
+
   </head>
   <body class="bg-gray-50 text-gray-800">
     <nav class="flex justify-between items-center py-6">
@@ -49,16 +52,20 @@
             <div class="{{ 'text-green-600' if progress == 100 else 'text-gray-600' }}">Budget</div>
         </div>
     </div>
+    <div class="container mx-auto px-4 py-8">
+      <div class="bg-white p-8 shadow-lg rounded-lg max-w-3xl mx-auto">
       <form method="post" class="mt-4">
         <input type="hidden" name="current_section" value="{{ current_section }}">
         <input type="hidden" name="service_name" value="{{ service_name }}">
             <div class="form-section">
                 <label for="service_name" class="block text-gray-700 text-sm font-bold mb-2">Enter the Agrotourism Service Name:</label>
+                
                 <input type="text" id="service_name" name="service_name" required class="form-input" />
             </div>
 
             <div class="form-section">
                 <label class="font-semibold text-lg mb-2 block">Land Size</label>
+                <img id="farmImage" class="mt-4 hidden" src="https://placehold.co/600x400" alt="Farm Image" />
                 <input type="number" name="land_size" class="form-input" placeholder="Enter land size in hectares" aria-label="Land Size" required>
             </div>
 
@@ -91,6 +98,8 @@
 
             <input type="submit" value="Start Generation" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline cursor-pointer" />
           </form>
+      </div>
+    </div>
       {% if sections %}
       <div class="mt-8">
         {% for section in sections %}
@@ -152,5 +161,6 @@
     });
 
     </script>
+    <script src="../static/predict.js"></script>
   </body>
 </html>
