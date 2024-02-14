@@ -32,88 +32,79 @@
       <h2 class="text-xl font-bold text-green-600">
         Agrotourism Service Description Generator
       </h2>
+
       <div class="my-4">
         <div class="flex items-center mb-2">
-          <div class="text-sm font-medium text-green-500 leading-none mr-2">
-            Progress:
-          </div>
-          <div class="flex-1 h-2 bg-gray-200 rounded-full">
-            <div
-              class="h-2 bg-green-500 rounded-full"
-              style="width: {{ '%d%%' | format(progress) }}"
-            ></div>
-          </div>
+            <div class="text-sm font-medium text-green-500 leading-none mr-2">
+                Progress:
+            </div>
+            <div class="flex-1 h-2 bg-gray-200 rounded-full">
+                <div class="h-2 bg-green-500 rounded-full" style="width: {{ progress }}%;"></div>
+            </div>
         </div>
         <div class="flex justify-between text-xs font-medium text-gray-600">
-          <div
-            class="{{ 'text-green-600' if progress >= 25 else 'text-gray-600' }}"
-          >
-            Description
-          </div>
-          <div
-            class="{{ 'text-green-600' if progress >= 50 else 'text-gray-600' }}"
-          >
-            Business Model
-          </div>
-          <div
-            class="{{ 'text-green-600' if progress >= 75 else 'text-gray-600' }}"
-          >
-            Setup Process
-          </div>
-          <div
-            class="{{ 'text-green-600' if progress == 100 else 'text-gray-600' }}"
-          >
-            Budget
-          </div>
+            <div class="{{ 'text-green-600' if progress >= 25 else 'text-gray-600' }}">Description</div>
+            <div class="{{ 'text-green-600' if progress >= 50 else 'text-gray-600' }}">Business Model</div>
+            <div class="{{ 'text-green-600' if progress >= 75 else 'text-gray-600' }}">Setup Process</div>
+            <div class="{{ 'text-green-600' if progress == 100 else 'text-gray-600' }}">Budget</div>
         </div>
-      </div>
+    </div>
       <form method="post" class="mt-4">
-        <label
-          for="service_name"
-          class="block text-gray-700 text-sm font-bold mb-2"
-          >Enter the Agrotourism Service Name:</label
-        >
-        <input
-          type="text"
-          id="service_name"
-          name="service_name"
-          required
-          value="{{ service_name }}"
-          class="shadow appearance-none border rounded py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline w-full"
-        />
-        <input
-          type="submit"
-          value="Start Generation"
-          class="mt-4 bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline cursor-pointer"
-        />
-      </form>
+        <input type="hidden" name="current_section" value="{{ current_section }}">
+        <input type="hidden" name="service_name" value="{{ service_name }}">
+            <div class="form-section">
+                <label for="service_name" class="block text-gray-700 text-sm font-bold mb-2">Enter the Agrotourism Service Name:</label>
+                <input type="text" id="service_name" name="service_name" required class="form-input" />
+            </div>
+
+            <div class="form-section">
+                <label class="font-semibold text-lg mb-2 block">Land Size</label>
+                <input type="number" name="land_size" class="form-input" placeholder="Enter land size in hectares" aria-label="Land Size" required>
+            </div>
+
+            <div class="form-section">
+                <label class="font-semibold text-lg mb-2 block">Biodiversity</label>
+                <select name="biodiversity" class="form-select" aria-label="Biodiversity">
+                    <option value="coastal">Coastal</option>
+                    <option value="forest">Forest</option>
+                    <option value="hills">Hills</option>
+                    <option value="plains">Plains</option>
+                </select>
+            </div>
+
+            <div class="form-section">
+                <label class="font-semibold text-lg mb-2 block">Budget (INR)</label>
+                <input type="number" name="budget" class="form-input" placeholder="Enter your budget in INR" aria-label="Budget" required>
+            </div>
+
+            <div class="form-section">
+                <label class="font-semibold text-lg mb-2 block">Existing Infrastructure</label>
+                <div class="checkbox-container">
+                    <label><input type="checkbox" name="infrastructure[]" value="Tea Bungalow" class="form-checkbox mr-2">Tea Bungalow</label>
+                    <label><input type="checkbox" name="infrastructure[]" value="Tent Accommodation" class="form-checkbox mr-2">Tent Accommodation</label>
+                    <label><input type="checkbox" name="infrastructure[]" value="Cottage" class="form-checkbox mr-2">Cottage</label>
+                    <label><input type="checkbox" name="infrastructure[]" value="Pond" class="form-checkbox mr-2">Pond</label>
+                    <label><input type="checkbox" name="infrastructure[]" value="Storage Facility" class="form-checkbox mr-2">Storage Facility</label>
+                    <label><input type="checkbox" name="infrastructure[]" value="Traditional House" class="form-checkbox mr-2">Traditional House</label>
+                </div>
+            </div>
+
+            <input type="submit" value="Start Generation" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline cursor-pointer" />
+          </form>
       {% if sections %}
       <div class="mt-8">
         {% for section in sections %}
         <div class="mb-8 p-4 shadow-lg rounded-lg bg-white">
-          <h3 class="font-bold text-green-600">
-            Generated {{ section.name.replace('_', ' ').title() }} for {{
-            service_name }}:
-          </h3>
+          <h3 class="font-bold text-green-600">Generated {{ section.name.replace('_', ' ').title() }} for {{ service_name }}:</h3>
           <div class="mt-2 text-gray-600">{{ section.content | safe }}</div>
-        </div>
+      </div>
         {% endfor %} {% if not is_final_section %}
         <form method="post" class="flex justify-between items-center mt-4">
-          <input type="hidden" name="service_name" value="{{ service_name }}" />
-          <input type="hidden" name="section" value="{{ sections[-1].name }}" />
-          <input
-            type="submit"
-            name="accept"
-            value="Yes, loved it!"
-            class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline cursor-pointer"
-          />
-          <input
-            type="submit"
-            name="regenerate"
-            value="Generate Again"
-            class="ml-2 bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline cursor-pointer"
-          />
-        </form>
+          <input type="hidden" name="current_section" value="{{ current_section }}">
+          <input type="hidden" name="service_name" value="{{ service_name }}">
+          <input type="submit" name="accept" value="Yes, loved it!" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline cursor-pointer" />
+          <input type="submit" name="regenerate" value="Generate Again" class="ml-2 bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline cursor-pointer" />
+      </form>
         {% else %}
         <p class="mt-4 text-green-600">Thank you for using our service!</p>
         {% endif %}
@@ -122,21 +113,19 @@
       
       {% if is_final_section %}
       <!-- Display Button -->
-      <div class="flex justify-end mt-4">
-        <button
-          id="displayButton"
-          class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline cursor-pointer"
-        >
-          Display
-        </button>
-      </div>
+      <div class="flex justify-end mt-4 space-x-4">
+        <button id="displayButton" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline cursor-pointer">Display Plan</button>
+        <form method="POST" action="/download" class="inline">
+            <input type="hidden" name="service_name" value="{{ service_name }}">
+            <button type="submit" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline cursor-pointer">Download Plan</button>
+        </form>
+    </div>
 
       <!-- Your Agrotourism Service Plan Section, hidden by default -->
-      <div id="approvedSections" class="mt-8 hidden">
+      <!-- <div id="approvedSections" class="mt-8 hidden">
         <h3 class="text-xl font-bold text-green-600">
           Your Agrotourism Service Plan:
         </h3>
-        <!-- Approved Sections will be displayed here -->
         {% for section_name, section_content in approved_sections.items() %}
         <div class="mb-8 p-4 shadow-lg rounded-lg bg-white">
           <h4 class="font-bold text-green-600">
@@ -145,27 +134,23 @@
           <div class="mt-2 text-gray-600">{{ section_content | safe }}</div>
         </div>
         {% endfor %}
-      </div>
+      </div> -->
 
-      <form method="POST" action="/download">
-        <input type="hidden" name="service_name" value="{{ service_name }}">
-        <button type="submit" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline cursor-pointer">
-            Download
-        </button>
-    </form>
+      
 
       {% endif %}
     </div>
     <script>
       function toggleMenu() {
         var navigation = document.querySelector(".nav-links");
-        navigation.classList.toggle("mobile-menu");
-      }
-      
-        document.getElementById('displayButton').addEventListener('click', function() {
+        navigation.classList.toggle("hidden"); // Adjusted to toggle hidden class
+    }
+
+    document.getElementById('displayButton')?.addEventListener('click', function() {
         var approvedSections = document.getElementById('approvedSections');
         approvedSections.classList.toggle('hidden');
     });
+
     </script>
   </body>
 </html>

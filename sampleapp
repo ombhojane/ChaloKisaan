@@ -52,6 +52,12 @@ def format_response(response):
     return formatted_response.replace("<ul></ul>", "")  # Remove empty list tags
 
 
+def calculate_progress(sections, section_order):
+    # Calculate progress based on the number of completed sections
+    progress = int((len(sections) / len(section_order)) * 100)
+    return progress
+
+
 # adding visualiztions
 
 # device = "cuda" if torch.cuda.is_available() else "cpu"
@@ -142,77 +148,90 @@ def pedict():
 
 @app.route('/generate', methods=['GET', 'POST'])
 def generate():
-    # Initialize or get current section and form data from session
+    current_section = 'description'
+
     if request.method == 'POST':
-        # Ensure form_data is updated or initialized correctly
-        form_data = {
-            'service_name': request.form['service_name'],
-            'land_size': request.form.get('land_size', 'N/A'),
-            'biodiversity': request.form.get('biodiversity', 'N/A'),
-            'budget': request.form.get('budget', 'N/A'),
-            'infrastructure': request.form.getlist('infrastructure[]'),
-        }
-        session['form_data'] = form_data
 
-        # Initialize or get sections from session
+        if 'service_name' in request.form:
+            session['form_data'] = {
+                'service_name': request.form['service_name'],
+                'land_size': request.form.get('land_size', 'N/A'),
+                'biodiversity': request.form.get('biodiversity', 'N/A'),
+                'budget': request.form.get('budget', 'N/A'),
+                'infrastructure': request.form.getlist('infrastructure[]'),
+            }
+
+        form_data = session.get('form_data', {})
+
+        service_name = form_data.get('service_name', '')
         sections = session.get('sections', [])
+        current_section = 'description'  
+
         if sections:
-            # Determine the current section from the last entry in sections
-            current_section = sections[-1]['name']
-        else:
-            # Default to starting with 'description'
-            current_section = 'description'
+            current_section = sections[-1]['name']  
 
-        # Determine next section
         section_order = ['description', 'business_model', 'setup_process', 'budget']
-        current_index = section_order.index(current_section)
+        current_section_index = section_order.index(current_section) if current_section in section_order else 0
+        progress = int(((current_section_index + 1) / len(section_order)) * 100)
+        next_section_index = section_order.index(current_section) + 1
 
-        if 'accept' in request.form:
-            # If accepting current section, move to next unless at the end
-            if current_index + 1 < len(section_order):
-                current_section = section_order[current_index + 1]
+
+        if 'accept' in request.form and sections:
+            # Find the next section based on the current_section
+            section_order = ['description', 'business_model', 'setup_process', 'budget']
+            next_section_index  = section_order.index(current_section) + 1
+            if next_section_index  < len(section_order):
+                current_section = section_order[next_section_index ]
+                prompt_template = create_prompt_template(current_section, session['form_data'])
+                response = generate_description(prompt_template, get_generation_config(), get_safety_settings())
+                formatted_response = format_response(response)
+                sections.append({'name': current_section, 'content': formatted_response})
             else:
-                # If at the last section, perhaps redirect or indicate completion
-                return render_template('complete.html', sections=sections, service_name=form_data['service_name'])
+                # All sections are complete
+                return render_template('complete.html', sections=sections, service_name=service_name)
         elif 'regenerate' in request.form:
-            # If regenerating, stay on current_section
-            pass  # current_section remains the same
+            # Regenerate current section
+            prompt_template = create_prompt_template(current_section, session['form_data'])
+            response = generate_description(prompt_template, get_generation_config(), get_safety_settings())
+            formatted_response = format_response(response)
+            if sections:
+                sections[-1]['content'] = formatted_response
+            else:
+                sections.append({'name': current_section, 'content': formatted_response})
         else:
-            # Handling for generating the first section or when not accepting/regenerating
-            if not sections:  # If starting fresh
-                current_section = 'description'
+            # First visit or generating first section
+            prompt_template = create_prompt_template(current_section, session['form_data'])
+            response = generate_description(prompt_template, get_generation_config(), get_safety_settings())
+            formatted_response = format_response(response)
+            sections.append({'name': current_section, 'content': formatted_response})
 
-        # Generate content for the current or next section
-        prompt_template = create_prompt_template(current_section, form_data)
+        
+        
+        prompt_template = create_prompt_template(current_section, session['form_data'])
         response = generate_description(prompt_template, get_generation_config(), get_safety_settings())
         formatted_response = format_response(response)
 
-        # Update sections list appropriately
-        if 'accept' in request.form and sections:
-            # Replace last section content if regenerating; otherwise, append new section
-            sections[-1] = {'name': current_section, 'content': formatted_response}
+        # Update or add the current section's content
+        if sections and 'accept' not in request.form:
+            sections[-1]['content'] = formatted_response  # Update last section if regenerating
         else:
-            sections.append({'name': current_section, 'content': formatted_response})
+            sections.append({'name': current_section, 'content': formatted_response})  # Add new section
 
-        # Save updated sections and form_data back to session
+        # Update session data
         session['sections'] = sections
-
-        # Calculate progress for UI feedback
         progress = calculate_progress(sections, section_order)
 
-        # Render the template with updated context
-        return render_template('generate.html', sections=sections, current_section=current_section, service_name=form_data['service_name'], progress=progress)
+        return render_template('generate.html', sections=sections, current_section=current_section, service_name=service_name, progress=progress)
+
+
+
+
     else:
-        # Clear the session for a new start and render the initial form
+        # Clear the session for a new start
         session.clear()
         return render_template('generate.html', sections=[], current_section='description', service_name='', progress=0)
 
-def calculate_progress(sections, section_order):
-    # Calculate the progress based on sections completed
-    completed_sections = len(sections)
-    total_sections = len(section_order)
-    progress = int((completed_sections / total_sections) * 100)
-    return progress
+
 
 def create_prompt_template(current_section, form_data):
     # Create a detailed prompt for the current section based on form_data
