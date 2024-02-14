@@ -51,6 +51,13 @@ def format_response(response):
     formatted_response = "<ul>" + "\n".join(formatted_lines) + "</ul>" if formatted_lines else response
     return formatted_response.replace("<ul></ul>", "")  # Remove empty list tags
 
+def calculate_progress(sections):
+    completed_sections = [section for section in sections if section['content']]
+    total_sections = 4  # description, business_model, setup_process, budget
+    progress = int((len(completed_sections) / total_sections) * 100)
+    return progress
+
+
 # adding visualiztions
 
 # device = "cuda" if torch.cuda.is_available() else "cpu"
@@ -138,6 +145,22 @@ def pedict():
     session.clear()  # Clear session at the start
     return render_template('predict.html')
 
+@app.route('/download', methods=['POST'])
+def download():
+    service_name = request.form['service_name']
+    approved_sections = session.get('approved_sections', {})
+    # You need to implement the logic to convert approved_sections into a downloadable format
+    # For example:
+    download_content = "Your Agrotourism Service Plan\n"
+    for section_name, section_content in approved_sections.items():
+        download_content += f"{section_name.title()}\n{section_content}\n\n"
+    
+    # Create a response with the content
+    response = make_response(download_content)
+    response.headers["Content-Disposition"] = "attachment; filename=service_plan.txt"
+    response.headers["Content-Type"] = "text/plain"
+    return response
+
 @app.route('/generate', methods=['GET', 'POST'])
 def generate():
     if request.method == 'POST':
@@ -145,41 +168,65 @@ def generate():
         session['service_name'] = service_name
 
         sections = session.get('sections', [])
+        approved_sections = session.get('approved_sections', {})
         current_section = request.form.get('section', 'description')
-
-        is_final_section = False  # Flag to indicate if the current section is the final one
+        is_final_section = False
 
         if 'accept' in request.form:
+            # Store the current approved section content
+            approved_sections[current_section] = sections[-1]['content']
+            session['approved_sections'] = approved_sections
+
             next_section_map = {
                 'description': 'business_model',
                 'business_model': 'setup_process',
                 'setup_process': 'budget',
-                'budget': 'end'  # Indicates the end of the sections
+                'budget': 'end'
             }
             next_section = next_section_map.get(current_section)
 
             if next_section == 'end':
-                is_final_section = True  # Set the flag when we reach the final section
-            elif next_section:
+                is_final_section = True
+                # Prepare for download, show download button
+                progress = 100  # Final section implies 100% progress
+                # Render the template with the final section and show the download button
+                return render_template('generate.html', sections=sections, service_name=service_name, 
+                                       is_final_section=is_final_section, progress=progress, 
+                                       approved_sections=approved_sections, show_download=True)
+            else:
+                # Append the new section if it's not the end
                 sections.append({'name': next_section, 'content': ''})
                 current_section = next_section
-        elif sections and sections[-1]['name'] == current_section:
+
+        elif 'regenerate' in request.form:
+            # If regenerate is clicked, simply re-display the current section with the old content
+            # There's no need to append a new section or generate new content
             pass
+
         else:
+            # New section is being started without any user approval action
             sections.append({'name': current_section, 'content': ''})
 
+        # Generate content for the current section
         prompt_parts = [f"Generate {current_section} for {service_name} in the context of agrotourism."]
-
         response = generate_description(prompt_parts, get_generation_config(), get_safety_settings())
-        formatted_response = format_response(response)  # Apply formatting to the response
+        formatted_response = format_response(response)
         sections[-1]['content'] = formatted_response
 
         session['sections'] = sections
+        progress = calculate_progress(sections)
 
-        return render_template('generate.html', sections=sections, service_name=service_name, is_final_section=is_final_section)
+        return render_template('generate.html', sections=sections, service_name=service_name, 
+                               is_final_section=is_final_section, progress=progress, 
+                               approved_sections=approved_sections, show_download=False)
     else:
-        session.pop('sections', None)  # Clear session for new start
-        return render_template('generate.html', sections=[], service_name=None, is_final_section=False)
+        # Clear the session for a new start
+        session.pop('sections', None)
+        session.pop('approved_sections', None)
+        return render_template('generate.html', sections=[], service_name=None, 
+                               is_final_section=False, progress=0, approved_sections={}, 
+                               show_download=False)
+
 
 
 if __name__ == '__main__':
