@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chalo Kisaan</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+<link rel="stylesheet" href="../static/predict.css" /> 
+<link rel="stylesheet" href="../static/styles.css" />
+
+<script src="../static/predict.js"></script>
+
+</head>
+<body>
+
+<!-- Navigation -->
+<nav class="flex justify-between items-center py-6">
+  <a href="#" class="text-2xl font-bold text-gray-800">Chalo Kisaan</a>
+  <div class="menu-toggle" onclick="toggleMenu()">
+    <i class="fas fa-bars fa-2x"></i>
+  </div>
+  <div class="nav-links hidden md:flex">
+    <a href="/predict" class="text-gray-600 mx-2">Start Planning</a>
+    <a href="/generate" class="text-gray-600 mx-2">Generate</a>
+    <a href="#" class="text-blue-600 mx-2">How it works?</a>
+  </div>
+</nav>
+
+<!-- Main Content -->
+<div class="container mx-auto px-4 py-8">
+  <div class="bg-white p-8 shadow-lg rounded-lg max-w-3xl mx-auto">
+    <h1 class="text-4xl font-bold mb-6 text-green-700">Plan your next agrotourism service</h1>
+    <div class="relative h-0" style="padding-bottom: 65%;">
+      <img src="https://i.postimg.cc/MKVpG2Bf/planning.png" alt="Agrotourism Image" class="absolute inset-0 w-full object-cover rounded-lg" />
+    </div>
+    <form>
+      <div class="form-section">
+          <label class="font-semibold text-lg mb-2 block">Land Size</label>
+          <img id="farmImage" class="mt-4 hidden" src="https://placehold.co/600x400" alt="Farm Image" />
+          <input type="number" id="landSizeInput" class="form-input" placeholder="Enter land size in hectares" aria-label="Land Size" oninput="updateFarmImage()" required>
+      </div>
+
+
+      <div class="form-section">
+        <label class="font-semibold text-lg mb-2 block">Biodiversity</label>
+        <select class="form-select" aria-label="Biodiversity">
+          <option value="coastal">Coastal</option>
+          <option value="forest">Forest</option>
+          <option value="hills">Hills</option>
+          <option value="plains">Plains</option>
+        </select>
+      </div>
+
+      <div class="form-section">
+          <label class="font-semibold text-lg mb-2 block">Budget (INR)</label>
+          <input type="number" class="form-input" placeholder="Enter your budget in INR" aria-label="Budget" required>
+        
+
+        <button id="toggleButton" class="mt-2" onclick="toggleBudgetInfo(event)">
+          <i id="arrowIcon" class="fas fa-chevron-down"></i> Budget Information
+        </button>
+      </div>
+
+
+      <!-- Modify the HTML for the budgetInfo section -->
+      <div id="budgetInfo" class="hidden mt-4">
+        <table id="budgetTable" class="min-w-full divide-y divide-gray-200">
+          <thead>
+            <tr>
+              <th>Type</th>
+              <th>Target Audience</th>
+              <th>Price Range</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- Table rows will be dynamically added here -->
+          </tbody>
+        </table>
+      </div>
+
+
+
+      <div class="form-section">
+        <label class="font-semibold text-lg mb-2 block">Existing Infrastructure</label>
+        <div class="checkbox-container">
+          <label><input type="checkbox" class="form-checkbox mr-2">Tea Bungalow</label>
+          <label><input type="checkbox" class="form-checkbox mr-2">Tent Accommodation</label>
+          <label><input type="checkbox" class="form-checkbox mr-2">Cottage</label>
+          <label><input type="checkbox" class="form-checkbox mr-2">Pond</label>
+          <label><input type="checkbox" class="form-checkbox mr-2">Storage Facility</label>
+          <label><input type="checkbox" class="form-checkbox mr-2">Traditional House</label>
+        </div>
+      </div>
+
+      <button type="submit" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
+        <i class="fas fa-check mr-2"></i>Submit
+      </button>
+
+      </form>
+  </div>
+</div>
+
+<!-- Footer -->
+<div class="footer">
+  &copy; 2024 Chalo Kisaan. All rights reserved.
+</div>
+
+
+<script>
+  function toggleMenu() {
+    var navigation = document.querySelector('.nav-links');
+    navigation.classList.toggle('mobile-menu');
+  }
+</script>
+</body>
+</html>
