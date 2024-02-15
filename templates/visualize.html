@@ -3,21 +3,116 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Work in Progress</title>
-    <link href="https://cdn.tailwindcss.com" rel="stylesheet">
-    <style>
-        /* Additional custom styles if needed */
-    </style>
+    <title>Chalo Kisaan Visualization Feature</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+<link rel="stylesheet" href="../static/styles.css">
+
 </head>
-<body class="bg-gray-100 flex items-center justify-center h-screen">
-    <div class="text-center">
-        <h1 class="text-4xl font-bold text-gray-800 mb-4">Work in Progress</h1>
-        <p class="text-lg text-gray-600 mb-5">We're working hard to finish the development of this page. Check back soon!</p>
-        <div>
-            <a href="/" class="inline-block bg-blue-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-600 transition duration-300">
-                Go Back to Home
-            </a>
+<body class="bg-gray-100">
+    <div class="container mx-auto px-4">
+        <div class="my-10">
+            <h1 class="text-3xl font-bold text-center mb-4">Chalo Kisaan Visualization Feature</h1>
         </div>
+
+        <div class="mb-10">
+            <h2 class="text-2xl font-semibold mb-2">Feature Description</h2>
+            <p class="text-lg text-gray-700">The visualization feature of the Chalo Kisaan leverages advanced AI models to transform an original farm image into a vision of the farm with agrotourism services implemented. This is achieved by first extracting a depth map from the original image, then using this depth map along with a text prompt to guide the generation of the new image that illustrates the concept of vineyard agrotourism on the farm.</p>
+        </div>
+
+        <div class="grid md:grid-cols-2 gap-4">
+            <div>
+                <img src="https://thumbs.dreamstime.com/b/beautiful-indian-farm-landscape-11981336.jpg" alt="Original Farm Image" class="rounded-lg shadow-lg">
+                <h3 class="text-xl font-semibold mb-2 " style="text-align: center; padding: 10px;">Before: Original Farm Image</h3>
+
+            </div>
+            <div>
+                <!-- Placeholder for the generated image, replace src with the actual image path -->
+                <img src="https://i.postimg.cc/3JZLXW5X/after.png" alt="Farm with Agrotourism Service" class="rounded-lg shadow-lg">
+                <h3 class="text-xl font-semibold mb-2" style="text-align: center; padding: 10px;" >After: Vineyard Agrotourism Service Implemented</h3>
+
+            </div>
+        </div>
+
+        <div class="mb-10">
+            <h2 class="text-2xl font-semibold mb-2">Code Snippet</h2>
+            <div class="relative">
+                <pre class="bg-gray-800 text-gray-300 p-4 rounded-lg overflow-x-auto">
+<code class="language-python">!pip install transformers diffusers accelerate==0.20.3
+
+import torch
+import numpy as np
+from transformers import pipeline
+from diffusers import StableDiffusionControlNetImg2ImgPipeline, ControlNetModel, UniPCMultistepScheduler
+from diffusers.utils import load_image, make_image_grid
+
+# Load the farm image
+farm_image_url = "https://thumbs.dreamstime.com/b/beautiful-indian-farm-landscape-11981336.jpg"
+farm_image = load_image(farm_image_url)
+
+# Extract the depth map
+depth_estimator = pipeline("depth-estimation")
+def get_depth_map(image, depth_estimator):
+    image = depth_estimator(image)["depth"]
+    image = np.array(image)
+    image = image[:, :, None]
+    image = np.concatenate([image, image, image], axis=2)
+    detected_map = torch.from_numpy(image).float() / 255.0
+    depth_map = detected_map.permute(2, 0, 1)
+    return depth_map
+depth_map = get_depth_map(farm_image, depth_estimator).unsqueeze(0).half().to("cuda")
+
+# Load the ControlNet model and the StableDiffusionControlNetImg2ImgPipeline
+controlnet = ControlNetModel.from_pretrained("lllyasviel/sd-controlnet-normal", torch_dtype=torch.float16, use_safetensors=True)
+pipe = StableDiffusionControlNetImg2ImgPipeline.from_pretrained(
+    "runwayml/stable-diffusion-v1-5",
+    controlnet=controlnet,
+    torch_dtype=torch.float16,
+    use_safetensors=True
+).to("cuda")
+pipe.scheduler = UniPCMultistepScheduler.from_config(pipe.scheduler.config)
+pipe.enable_model_cpu_offload()
+
+prompt = "vineyard agrotourism service on the farm"
+output = pipe(
+    prompt,
+    image=farm_image,
+    control_image=depth_map,
+).images[0]
+
+# Display the original and generated images
+make_image_grid([farm_image, output], rows=1, cols=2)
+</code>
+</pre>
+<button onclick="copyToClipboard()" class="absolute top-0 right-0 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-tr-lg rounded-bl-lg">
+    Copy Code
+</button>
+</div>
+</div>
+<div class="text-center mb-10">
+    <a href="https://colab.research.google.com/drive/1w9jJawR2uKxFky0u_aawCZxIjhC9uSeO?usp=sharing" target="_blank" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
+        Test Code on Colab
+    </a>
+</div>
+        
     </div>
+
+    <script>
+        function copyToClipboard() {
+            const el = document.createElement('textarea');
+            el.value = document.querySelector('pre code').innerText;
+            document.body.appendChild(el);
+            el.select();
+            document.execCommand('copy');
+            document.body.removeChild(el);
+            alert('Code copied to clipboard!');
+        }
+
+        document.getElementById('toggleImages').addEventListener('click', function() {
+            const images = document.getElementById('imagesContainer').querySelectorAll('img');
+            images.forEach(img => img.classList.toggle('hidden'));
+        });
+    </script>
 </body>
 </html>
