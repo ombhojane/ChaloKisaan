@@ -2,37 +2,22 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Image Generation</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Work in Progress</title>
+    <link href="https://cdn.tailwindcss.com" rel="stylesheet">
+    <style>
+        /* Additional custom styles if needed */
+    </style>
 </head>
-<body>
-    <h2>Image Generation Form</h2>
-    <form id="generateForm" enctype="multipart/form-data">
-        <input type="file" id="image" name="image" required>
-        <button type="submit">Generate Image</button>
-    </form>
-    <h3>Generated Image:</h3>
-    <img id="outputImage" src="" alt="Generated Image" style="max-width: 500px;">
-
-    <script>
-        document.getElementById('generateForm').addEventListener('submit', function(e) {
-            e.preventDefault(); // Prevent the default form submission
-            
-            const formData = new FormData();
-            const imageInput = document.getElementById('image');
-            if (imageInput.files.length > 0) {
-                formData.append('image', imageInput.files[0]);
-            }
-
-            fetch('/generate-image', {
-                method: 'POST',
-                body: formData,
-            })
-            .then(response => response.json())
-            .then(data => {
-                document.getElementById('outputImage').src = data.generatedImageUrl;
-            })
-            .catch(error => console.error('Error:', error));
-        });
-    </script>
+<body class="bg-gray-100 flex items-center justify-center h-screen">
+    <div class="text-center">
+        <h1 class="text-4xl font-bold text-gray-800 mb-4">Work in Progress</h1>
+        <p class="text-lg text-gray-600 mb-5">We're working hard to finish the development of this page. Check back soon!</p>
+        <div>
+            <a href="/" class="inline-block bg-blue-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-600 transition duration-300">
+                Go Back to Home
+            </a>
+        </div>
+    </div>
 </body>
 </html>
