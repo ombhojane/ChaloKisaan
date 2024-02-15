@@ -8,12 +8,32 @@
 <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
 <link rel="stylesheet" href="../static/styles.css">
-
+<style>
+    .footer {
+    background-color: #f0f9ff; /* Footer background to match the theme */
+    color: #333; /* Footer text color */
+    padding: 20px 0;
+    text-align: center;
+  }
+</style>
 </head>
 <body class="bg-gray-100">
     <div class="container mx-auto px-4">
+        <nav class="flex justify-between items-center py-6">
+            <a href="/" class="text-2xl font-bold text-gray-800">Chalo Kisaan</a>
+            <div class="menu-toggle" onclick="toggleMenu()">
+              <i class="fas fa-bars fa-2x"></i>
+            </div>
+            <div class="nav-links hidden md:flex">
+              <a href="/predict" class="text-gray-600 mx-2">Start Planning</a>
+              <a href="/visualize" class="text-gray-600 mx-2">Visualize</a>
+              <a href="/generate" class="text-gray-600 mx-2">Generate</a>
+              <a href="/docs" class="text-blue-600 mx-2">How it works?</a>
+            </div>
+          </nav>
+
         <div class="my-10">
-            <h1 class="text-3xl font-bold text-center mb-4">Chalo Kisaan Visualization Feature</h1>
+            <h1 class="text-3xl font-bold text-center mb-4 text-green-700">Chalo Kisaan Visualization Feature</h1>
         </div>
 
         <div class="mb-10">
@@ -95,6 +115,10 @@ make_image_grid([farm_image, output], rows=1, cols=2)
         Test Code on Colab
     </a>
 </div>
+
+<footer class="footer bg-green-50">
+    <p class="text-gray-800">&copy; 2024 Chalo Kisaan. All rights reserved.</p>
+  </footer>
         
     </div>
 
