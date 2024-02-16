@@ -8,7 +8,8 @@ Chalo Kisaan is an agrotourism service predictor that helps farmers generate pot
 
 2. **Interactive Visualizations**: Farmers can choose a service and generate interactive visuals to preview how the service would be implemented on their farm.
 
-3. **Service Description**: A large language model (LLM) provides a brief description of the business model, budget, and other essential details for the selected service.
+3. **Service Description**: Farmers can choose a service name and tailor the agrotourism service according to their preferences.
+Google's Gemini Pro LLM provides a brief description of the business model, budget estimations and other essential details for the selected service.
 
 ## How to Setup
 
