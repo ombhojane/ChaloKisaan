@@ -21,6 +21,20 @@
     padding: 20px 0;
     text-align: center;
   }
+  .feature-btn {
+    display: inline-block;
+    background-color: #4CAF50; /* Button color to match theme */
+    color: white;
+    padding: 10px 20px;
+    margin-top: 20px;
+    border-radius: 5px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: background-color 0.3s ease;
+  }
+  .feature-btn:hover {
+    background-color: #45a049; /* Darker shade on hover */
+  }
 </style>
 </head>
 <body>
@@ -34,7 +48,6 @@
         <a href="/predict" class="text-gray-600 mx-2">Start Planning</a>
         <a href="/visualize" class="text-gray-600 mx-2">Visualize</a>
         <a href="/generate" class="text-gray-600 mx-2">Generate</a>
-        <a href="/docs" class="text-blue-600 mx-2">How it works?</a>
       </div>
     </nav>
 
@@ -51,13 +64,15 @@
   <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
       <!-- Before Image -->
       <div class="text-center">
-          <p class="text-lg text-gray-800 mb-2">Original Farm</p>
           <img src="https://i.postimg.cc/RCw9z1Kv/Screenshot-2024-02-14-205114.png" alt="Original Farm" class="mx-auto shadow-lg rounded-lg">
+          <p class="text-xl text-gray-800 mb-2" style="padding: 17px;">Before Transformation: Current Farm Image</p>
+
       </div>
       <!-- After Image -->
       <div class="text-center">
-          <p class="text-lg text-gray-800 mb-2">Farm with Vineyard Service Implemented</p>
-          <img src="https://i.postimg.cc/3JZLXW5X/after.png" alt="Farm with Service Implemented" class="mx-auto shadow-lg rounded-lg">
+          <img src="https://i.postimg.cc/3JZLXW5X/after.png" alt="Farm with Vineyard service Implemented" class="mx-auto shadow-lg rounded-lg">
+          <p class="text-xl text-gray-800 mb-2" style="padding: 17px;">After Chalo Kisaan's implementation: Farm with Vineyard Service </p>
+
       </div>
   </div>
 </section>
@@ -81,23 +96,21 @@
     <div class="w-full md:w-1/2 px-8">
         <h2 class="text-4xl font-bold text-gray-800 mb-4">Potential Agrotourism Service Prediction</h2>
         <p class="text-xl text-gray-600">Utilize our advanced prediction tools to discover the best-suited agrotourism services for your land. Based on factors like land size, surrounding biodiversity, budget, and available infrastructure, we help you carve a niche in the agrotourism market.</p>
+        <a href="/predict" class="feature-btn">Start Prediction</a>
     </div>
 </section>
 
-  <!-- Additional Sections Start Here -->
-
-  <!-- Section 2: Potential Agrotourism Service Prediction -->
   <section class="flex flex-col md:flex-row justify-between items-center py-10">
     <div class="w-full md:w-1/2 order-2 md:order-1 px-8">
         <h2 class="text-4xl font-bold text-gray-800 mb-4">Image Generator for Farm Services</h2>
         <p class="text-xl text-gray-600">After selecting a service, our image generator tool helps visualize its implementation on your actual farm. This innovative feature allows farmers to see potential changes and enhancements to their property, ensuring better planning and execution.</p>
+        <a href="/visualize" class="feature-btn">Visualize Service on your Farm</a>
     </div>
     <div class="w-full md:w-1/2 mb-4 md:mb-0 order-1 md:order-2">
         <img src="https://placehold.co/600x400" alt="Potential Agrotourism Service Prediction" class="mx-auto">
     </div>
 </section>
 
-  <!-- Section 3: Image Generator -->
   <section class="flex flex-col md:flex-row justify-between items-center py-10">
     <div class="w-full md:w-1/2 mb-4 md:mb-0">
         <img src="https://i.postimg.cc/vm8NbBH8/ed5289b6-b4fc-48fd-955d-c7014954b63f.webp" height="200" width="600" alt="Image Generator Visualization" class="mx-auto">
@@ -105,6 +118,7 @@
     <div class="w-full md:w-1/2 px-8">
         <h2 class="text-4xl font-bold text-gray-800 mb-4">Comprehensive Business Model and Planning Tools</h2>
         <p class="text-xl text-gray-600">Our platform offers a detailed business model, setup process guidelines, and an itinerary generator, complemented by a chatbot for instant assistance. These tools are designed to streamline your venture into agrotourism, from conceptualization to realization.</p>
+        <a href="/generate" class="feature-btn">Generate Plan</a>
     </div>
 </section>
 
