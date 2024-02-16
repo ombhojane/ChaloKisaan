@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, session
+from flask import Flask, render_template, request, session, redirect, url_for
 import google.generativeai as genai
 import os
 # import torch
@@ -144,7 +144,8 @@ def pedict():
 def generate():
     # Initialize or get current section and form data from session
     if request.method == 'POST':
-        # Ensure form_data is updated or initialized correctly
+        current_section = request.form.get('current_section', session.get('form_data', {}).get('current_section', 'description'))
+       # Ensure form_data is updated or initialized correctly
         form_data = {
             'service_name': request.form['service_name'],
             'land_size': request.form.get('land_size', 'N/A'),
@@ -165,15 +166,25 @@ def generate():
 
         # Determine next section
         section_order = ['description', 'business_model', 'setup_process', 'budget']
+        
+
         current_index = section_order.index(current_section)
 
         if 'accept' in request.form:
             # If accepting current section, move to next unless at the end
-            if current_index + 1 < len(section_order):
-                current_section = section_order[current_index + 1]
+            accepted_sections = session.get('accepted_sections', [])
+            # Add the current section and its data to the accepted_sections list
+            accepted_sections.append(session['form_data'])
+            session['accepted_sections'] = accepted_sections
+            if current_section == section_order[-1]:
+                # Redirect to a new URL to display the saved info if this is the last section
+                return redirect(url_for('display_saved_info'))
             else:
-                # If at the last section, perhaps redirect or indicate completion
-                return render_template('complete.html', sections=sections, service_name=form_data['service_name'])
+                # Move to the next section if not the last
+                next_section_index = current_index + 1
+                current_section = section_order[next_section_index]
+                session['form_data']['current_section'] = current_section
+            
         elif 'regenerate' in request.form:
             # If regenerating, stay on current_section
             pass  # current_section remains the same
@@ -198,7 +209,8 @@ def generate():
         session['sections'] = sections
 
         # Calculate progress for UI feedback
-        progress = calculate_progress(sections, section_order)
+        progress = (current_index + 1) / len(section_order) * 100
+
 
         # Render the template with updated context
         return render_template('generate.html', sections=sections, current_section=current_section, service_name=form_data['service_name'], progress=progress)
@@ -213,6 +225,13 @@ def calculate_progress(sections, section_order):
     total_sections = len(section_order)
     progress = int((completed_sections / total_sections) * 100)
     return progress
+
+@app.route('/saved_info')
+def display_saved_info():
+    # Fetch the saved information from the session
+    accepted_sections = session.get('accepted_sections', [])
+    # Render a template to display the saved information
+    return render_template('saved_info.html', accepted_sections=accepted_sections)
 
 def create_prompt_template(current_section, form_data):
     # Create a detailed prompt for the current section based on form_data

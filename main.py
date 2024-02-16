@@ -51,6 +51,7 @@ def format_response(response):
     formatted_response = "<ul>" + "\n".join(formatted_lines) + "</ul>" if formatted_lines else response
     return formatted_response.replace("<ul></ul>", "")  # Remove empty list tags
 
+
 # adding visualiztions
 
 # device = "cuda" if torch.cuda.is_available() else "cpu"
@@ -124,6 +125,10 @@ def format_response(response):
 def visualize():
     return render_template('visualize.html')
 
+@app.route('/docs')
+def docs():
+    return render_template('docs.html')
+
 @app.route('/')
 def index():
     session.clear()  # Clear session at the start
@@ -134,48 +139,92 @@ def pedict():
     session.clear()  # Clear session at the start
     return render_template('predict.html')
 
+
 @app.route('/generate', methods=['GET', 'POST'])
 def generate():
+    # Initialize or get current section and form data from session
     if request.method == 'POST':
-        service_name = session.get('service_name', request.form['service_name'])
-        session['service_name'] = service_name
+        # Ensure form_data is updated or initialized correctly
+        form_data = {
+            'service_name': request.form['service_name'],
+            'land_size': request.form.get('land_size', 'N/A'),
+            'biodiversity': request.form.get('biodiversity', 'N/A'),
+            'budget': request.form.get('budget', 'N/A'),
+            'infrastructure': request.form.getlist('infrastructure[]'),
+        }
+        session['form_data'] = form_data
 
+        # Initialize or get sections from session
         sections = session.get('sections', [])
-        current_section = request.form.get('section', 'description')
+        if sections:
+            # Determine the current section from the last entry in sections
+            current_section = sections[-1]['name']
+        else:
+            # Default to starting with 'description'
+            current_section = 'description'
 
-        is_final_section = False  # Flag to indicate if the current section is the final one
+        # Determine next section
+        section_order = ['description', 'business_model', 'setup_process', 'budget']
+        current_index = section_order.index(current_section)
 
         if 'accept' in request.form:
-            next_section_map = {
-                'description': 'business_model',
-                'business_model': 'setup_process',
-                'setup_process': 'budget',
-                'budget': 'end'  # Indicates the end of the sections
-            }
-            next_section = next_section_map.get(current_section)
-
-            if next_section == 'end':
-                is_final_section = True  # Set the flag when we reach the final section
-            elif next_section:
-                sections.append({'name': next_section, 'content': ''})
-                current_section = next_section
-        elif sections and sections[-1]['name'] == current_section:
-            pass
+            # If accepting current section, move to next unless at the end
+            if current_index + 1 < len(section_order):
+                current_section = section_order[current_index + 1]
+            else:
+                # If at the last section, perhaps redirect or indicate completion
+                return render_template('complete.html', sections=sections, service_name=form_data['service_name'])
+        elif 'regenerate' in request.form:
+            # If regenerating, stay on current_section
+            pass  # current_section remains the same
         else:
-            sections.append({'name': current_section, 'content': ''})
+            # Handling for generating the first section or when not accepting/regenerating
+            if not sections:  # If starting fresh
+                current_section = 'description'
 
-        prompt_parts = [f"Generate {current_section} for {service_name} in the context of agrotourism."]
+        # Generate content for the current or next section
+        prompt_template = create_prompt_template(current_section, form_data)
+        response = generate_description(prompt_template, get_generation_config(), get_safety_settings())
+        formatted_response = format_response(response)
 
-        response = generate_description(prompt_parts, get_generation_config(), get_safety_settings())
-        formatted_response = format_response(response)  # Apply formatting to the response
-        sections[-1]['content'] = formatted_response
+        # Update sections list appropriately
+        if 'accept' in request.form and sections:
+            # Replace last section content if regenerating; otherwise, append new section
+            sections[-1] = {'name': current_section, 'content': formatted_response}
+        else:
+            sections.append({'name': current_section, 'content': formatted_response})
 
+        # Save updated sections and form_data back to session
         session['sections'] = sections
 
-        return render_template('generate.html', sections=sections, service_name=service_name, is_final_section=is_final_section)
+        # Calculate progress for UI feedback
+        progress = calculate_progress(sections, section_order)
+
+        # Render the template with updated context
+        return render_template('generate.html', sections=sections, current_section=current_section, service_name=form_data['service_name'], progress=progress)
     else:
-        session.pop('sections', None)  # Clear session for new start
-        return render_template('generate.html', sections=[], service_name=None, is_final_section=False)
+        # Clear the session for a new start and render the initial form
+        session.clear()
+        return render_template('generate.html', sections=[], current_section='description', service_name='', progress=0)
+
+def calculate_progress(sections, section_order):
+    # Calculate the progress based on sections completed
+    completed_sections = len(sections)
+    total_sections = len(section_order)
+    progress = int((completed_sections / total_sections) * 100)
+    return progress
+
+def create_prompt_template(current_section, form_data):
+    # Create a detailed prompt for the current section based on form_data
+    # Adjust this function as necessary to tailor prompts for each section
+    prompt_parts = [
+        f"Generate {current_section} for {form_data['service_name']}",
+        f"Land Size: {form_data['land_size']} hectares",
+        f"Biodiversity: {form_data['biodiversity']}",
+        f"Budget: INR {form_data['budget']}",
+        f"Existing Infrastructure: {', '.join(form_data['infrastructure'])}.",
+    ]
+    return " ".join(prompt_parts)
 
 
 if __name__ == '__main__':

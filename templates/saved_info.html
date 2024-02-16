@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Saved Information</title>
+</head>
+<body>
+    <h1>Saved Information</h1>
+    {% for section in accepted_sections %}
+        <div>
+            <h2>{{ section['current_section'] | capitalize }}</h2>
+            <p>Service Name: {{ section['service_name'] }}</p>
+            <p>Details: ...</p> <!-- Display other details as needed -->
+        </div>
+    {% else %}
+        <p>No information saved.</p>
+    {% endfor %}
+</body>
+</html>
