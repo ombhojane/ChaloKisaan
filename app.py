@@ -74,6 +74,8 @@ def pedict():
 def generate():
     # Initialize or get current section and form data from session
     if request.method == 'POST':
+        print("Service Name Received:", request.form['service_name'])
+
         form_data = {
             'service_name': request.form['service_name'],
             'land_size': request.form.get('land_size', 'N/A'),
