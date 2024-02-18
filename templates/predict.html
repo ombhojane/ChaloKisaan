@@ -10,6 +10,7 @@
 <link rel="stylesheet" href="../static/predict.css" /> 
 <link rel="stylesheet" href="../static/styles.css" />
 <script src="../static/predict.js"></script>
+<meta name="description" content="Chalo Kisaan - Bringing AI-powered agrotourism planning to Indian farms.">
 </head>
 <body>
   <div class="container mx-auto px-4 sm:px-6 lg:px-8">
@@ -38,10 +39,10 @@
   <div class="max-w-3xl mx-auto"> <!-- Container to control max width -->
     <!-- Image container -->
     <div class="mb-8"> <!-- Add margin bottom to separate from Gradio component -->
-      <img src="https://i.postimg.cc/MKVpG2Bf/planning.png" alt="Agrotourism Image" class="w-full h-auto mx-auto rounded-lg" style="max-height: 600px;">
+      <img src="https://i.postimg.cc/MKVpG2Bf/planning.png" alt="Agrotourism Image" class="w-full h-auto mx-auto rounded-lg">
     </div>
 
-    <div class="mt-4 text-gray-700 max-w-3xl mx-auto text-left">
+    <div class="mt-4 text-green-700 max-w-3xl mx-auto text-left pb-1">
       
       <p class="mb-4">
         Want to earn extra income from your farm while still growing crops? Offering tourism services is now easier and smarter than ever with our Agrotourism Planner powered by artificial intelligence!
@@ -60,7 +61,7 @@
       </p>
     </div>
     <!-- Gradio component container, should be same width as image above -->
-    <div>
+    <div class="mt-4">
       <gradio-app src="https://ombhojane-predictservice.hf.space"></gradio-app>
     </div>
   </div>
