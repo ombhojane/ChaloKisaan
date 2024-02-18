@@ -67,7 +67,7 @@ from diffusers import StableDiffusionControlNetImg2ImgPipeline, ControlNetModel,
 from diffusers.utils import load_image, make_image_grid
 
 # Load the farm image
-farm_image_url = "https://thumbs.dreamstime.com/b/beautiful-indian-farm-landscape-11981336.jpg"
+farm_image_url = "https://thumbs.dreamstime.com/b/beautiful-indian-farm-landscape-11981336.jpg" # Replace with the your farm iamge image URL
 farm_image = load_image(farm_image_url)
 
 # Extract the depth map
@@ -93,7 +93,7 @@ pipe = StableDiffusionControlNetImg2ImgPipeline.from_pretrained(
 pipe.scheduler = UniPCMultistepScheduler.from_config(pipe.scheduler.config)
 pipe.enable_model_cpu_offload()
 
-prompt = "vineyard agrotourism service on the farm"
+prompt = "vineyard agrotourism service on the farm" # Replace with your agrotourism service name
 output = pipe(
     prompt,
     image=farm_image,
@@ -105,13 +105,13 @@ make_image_grid([farm_image, output], rows=1, cols=2)
 </code>
 </pre>
 <button onclick="copyToClipboard()" class="absolute top-0 right-0 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-tr-lg rounded-bl-lg">
-    Copy Code
+    Copy Code to Clipboard
 </button>
 </div>
 </div>
 <div class="text-center mb-10">
     <a href="https://colab.research.google.com/drive/1w9jJawR2uKxFky0u_aawCZxIjhC9uSeO?usp=sharing" target="_blank" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
-        Test Code on Colab
+        Try Visualizations on Google Colab
     </a>
 </div>
 
