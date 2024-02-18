@@ -1,20 +1,36 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Agrotourism Service Generator</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
-    <link rel="stylesheet" href="../static/styles.css">
-</head>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
+    />
+    <link rel="stylesheet" href="../static/styles.css" />
+    
+    <link rel="stylesheet" href="../static/predict.css" /> 
+
+  </head>     
 <body class="bg-gray-50 text-gray-800">
     <div class="container mx-auto px-4 sm:px-6 lg:px-8">
-        <nav class="flex justify-between items-center py-6">
-            <a href="/" class="text-2xl font-bold text-gray-800">Chalo Kisaan</a>
-            <!-- Menu items -->
-        </nav>
+      <nav class="flex justify-between items-center py-6">
+        <a href="/" class="text-2xl font-bold text-gray-800">Chalo Kisaan</a>
+        <div class="menu-toggle" onclick="toggleMenu()">
+          <i class="fas fa-bars fa-2x"></i>
+        </div>
+        <div class="nav-links hidden md:flex">
+          <a href="/predict" class="text-gray-600 mx-2">Start Planning</a>
+          <a href="/visualize" class="text-gray-600 mx-2">Visualize</a>
+          <a href="/generate" class="text-gray-600 mx-2">Generate</a>
+        </div>
+      </nav>
 
         <div class="container mx-auto px-4 py-8">
             <h2 class="text-xl font-bold text-green-600">
@@ -32,7 +48,7 @@
                   <div class="form-section">
                       <label class="font-semibold text-lg mb-2 block">Land Size</label>
                       <img id="farmImage" class="mt-4 hidden" src="https://placehold.co/600x400" alt="Farm Image" />
-                      <input type="number" id="landSizeInput" name="land_size" class="form-input" placeholder="Enter land size in hectares" aria-label="Land Size" oninput="updateFarmImage()" required>
+                      <input type="number" id="landSizeInput" name="land_size" class="form-input" placeholder="Enter land size in acers" aria-label="Land Size" oninput="updateFarmImage()" required>
                   </div>
       
                   <div class="form-section">
@@ -83,6 +99,8 @@
       
                   <input type="submit" value="Start Generation" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline cursor-pointer" />
                 </form>
+
+              
                 {% if generated_content %}
                 <div class="mt-8 p-4 shadow-lg rounded-lg bg-white">
                     <h3 class="font-bold text-green-600">Generated Content for {{ service_name }}:</h3>

@@ -16,7 +16,7 @@ def create_complete_prompt(form_data):
     budget = form_data.get('budget', 'not specified')
     infrastructure = ", ".join(form_data.get('infrastructure', ['not specified']))
     
-    prompt = (f"Generate a comprehensive overview for {service_name}, including a catchy title, description, business model (covering revenue streams, cost structure, target market), setup process (planning to execution steps), and detailed budget breakdown. Consider land size of {land_size} hectares, biodiversity type {biodiversity}, budget of INR {budget}, and existing infrastructure: {infrastructure}.")
+    prompt = (f"Generate a comprehensive overview for {service_name}, including a catchy title, description, business model (covering revenue streams, cost structure, target market), setup process (planning to execution steps), and detailed budget breakdown. Consider land size of {land_size} acers, biodiversity type {biodiversity}, budget of INR {budget}, and existing infrastructure: {infrastructure}.")
     return prompt
 
 
@@ -121,24 +121,24 @@ def create_prompt_template(current_section):
     # Construct the prompt based on the current section
     if current_section == 'description':
         prompt = (f"Create a catchy title and a simple, engaging description for {service_name}, "
-                  f"considering its land size is {land_size} hectares, biodiversity type is {biodiversity}, "
+                  f"considering its land size is {land_size} acers, biodiversity type is {biodiversity}, "
                   f"budget is INR {budget}, and existing infrastructure includes {infrastructure}.")
                   
     elif current_section == 'business_model':
         prompt = (f"Outline a business model for {service_name} in bullet points, including revenue streams, "
-                  f"cost structure, and target market. Consider its land size of {land_size} hectares, "
+                  f"cost structure, and target market. Consider its land size of {land_size} acers, "
                   f"biodiversity type {biodiversity}, budget of INR {budget}, "
                   f"and existing infrastructure: {infrastructure}.")
                   
     elif current_section == 'setup_process':
         prompt = (f"Describe the setup process for {service_name} in a step-by-step format. Include necessary steps "
-                  f"from planning to execution, considering a land size of {land_size} hectares, "
+                  f"from planning to execution, considering a land size of {land_size} acers, "
                   f"biodiversity type {biodiversity}, a budget of INR {budget}, "
                   f"and infrastructure like {infrastructure}.")
                   
     elif current_section == 'budget':
         prompt = (f"Provide a detailed budget breakdown for {service_name}, listing key expenses and estimated costs "
-                  f"in INR. Consider aspects such as land size of {land_size} hectares, biodiversity type {biodiversity}, "
+                  f"in INR. Consider aspects such as land size of {land_size} acers, biodiversity type {biodiversity}, "
                   f"and planned infrastructure: {infrastructure}. Format the response as 'Item: Cost'.")
                   
     else:
