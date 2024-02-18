@@ -9,74 +9,98 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
 <link rel="stylesheet" href="../static/predict.css" /> 
 <link rel="stylesheet" href="../static/styles.css" />
-
 <script src="../static/predict.js"></script>
-
 </head>
 <body>
   <div class="container mx-auto px-4 sm:px-6 lg:px-8">
 
-<!-- Navigation -->
-<nav class="flex justify-between items-center py-6">
-  <a href="/" class="text-2xl font-bold text-gray-800">Chalo Kisaan</a>
-  <div class="menu-toggle" onclick="toggleMenu()">
-    <i class="fas fa-bars fa-2x"></i>
-  </div>
-  <div class="nav-links hidden md:flex">
-    <a href="/predict" class="text-gray-600 mx-2">Start Planning</a>
-    <a href="/visualize" class="text-gray-600 mx-2">Visualize</a>
-    <a href="/generate" class="text-gray-600 mx-2">Generate</a>
-  </div>
-</nav>
+    <!-- Navigation -->
+    <nav class="flex justify-between items-center py-6">
+      <a href="/" class="text-2xl font-bold text-gray-800">Chalo Kisaan</a>
+      <div class="menu-toggle" onclick="toggleMenu()">
+        <i class="fas fa-bars fa-2x"></i>
+      </div>
+      <div class="nav-links hidden md:flex">
+        <a href="/predict" class="text-gray-600 mx-2">Start Planning</a>
+        <a href="/visualize" class="text-gray-600 mx-2">Visualize</a>
+        <a href="/generate" class="text-gray-600 mx-2">Generate</a>
+      </div>
+    </nav>
 
 <!-- Main Content -->
-<div class="container mx-auto px-4 py-8">
-  <div class="bg-white p-8 shadow-lg rounded-lg max-w-3xl mx-auto">
-    <h1 class="text-2xl sm:text-3xl md:text-4xl font-bold mb-4 sm:mb-6 md:mb-8 text-green-700">Plan your next agrotourism service</h1>
-    <div class="relative h-0" style="padding-bottom: 65%;">
-      <img src="https://i.postimg.cc/MKVpG2Bf/planning.png" alt="Agrotourism Image" class="w-full object-cover rounded-lg max-h-48 md:max-h-96">
-    </div>
-    <gradio-app src="https://ombhojane-predictservice.hf.space"></gradio-app>
-    
+<div class="container mx-auto px-4 py-8 text-center">
+  <h1 class="text-2xl sm:text-3xl md:text-4xl font-bold mb-4 sm:mb-6 md:mb-8 text-green-700">Bring Your Farm to Life with Chalo Kisaan</h1>
   
+  <!-- New Description -->
+ 
+  
+  <!-- The rest of the content including the image and the Gradio component -->
+  <div class="max-w-3xl mx-auto"> <!-- Container to control max width -->
+    <!-- Image container -->
+    <div class="mb-8"> <!-- Add margin bottom to separate from Gradio component -->
+      <img src="https://i.postimg.cc/MKVpG2Bf/planning.png" alt="Agrotourism Image" class="w-full h-auto mx-auto rounded-lg" style="max-height: 600px;">
+    </div>
+
+    <div class="mt-4 text-gray-700 max-w-3xl mx-auto text-left">
+      
+      <p class="mb-4">
+        Want to earn extra income from your farm while still growing crops? Offering tourism services is now easier and smarter than ever with our Agrotourism Planner powered by artificial intelligence!
+      </p>
+      <p class="mb-4">
+        Simply provide basic details about your farm land like size, plant/animal diversity, budget etc. Our AI will explain any terms so it's simple to input the details.
+      </p>
+      <p class="mb-4">
+        Then our agrotourism-focused AI model analyzes these details and suggests the most suitable tourism services for your land out of hundreds of options. This could be farm stays, camping sites, guided trails and more!
+      </p>
+      <p class="mb-4">
+        You'll get visual previews of services custom-fitted on your land so you can see the income potential. We'll also provide AI-generated guidance on investments, facilities, business model and setup process to set up recommended service.
+      </p>
+      <p class="mb-4">
+        It's fast, it's free and it's designed to help Indian farmers exactly like you turn your farms into profitable tourism destinations that you can feel proud of! Shall we get started?
+      </p>
+    </div>
+    <!-- Gradio component container, should be same width as image above -->
+    <div>
+      <gradio-app src="https://ombhojane-predictservice.hf.space"></gradio-app>
+    </div>
   </div>
 </div>
 
-<!-- Footer -->
-<div class="footer">
-  &copy; 2024 Chalo Kisaan. All rights reserved.
-</div>
-  </div>
 
+
+
+
+    <!-- Footer -->
+    <div class="footer">
+      &copy; 2024 Chalo Kisaan. All rights reserved.
+    </div>
+  </div>
 
   <div id="loader-overlay" class="fixed inset-0 bg-gray-100 bg-opacity-75 flex justify-center items-center z-50">
     <div class="text-sm sm:text-base font-semibold text-gray-700">Model is loading...</div>
   </div>
-  
-    
 
-<script>
-  function toggleMenu() {
-    var navigation = document.querySelector('.nav-links');
-    navigation.classList.toggle('mobile-menu');
-  }
+  <script>
+    function toggleMenu() {
+      var navigation = document.querySelector('.nav-links');
+      navigation.classList.toggle('mobile-menu');
+    }
 
-  window.addEventListener('load', function() {
-    const observer = new MutationObserver((mutations, obs) => {
-      const gradioLoaded = document.querySelector('gradio-app');
-      if (gradioLoaded) {
-        document.getElementById('loader-overlay').style.display = 'none';
-        obs.disconnect(); // Stop observing once we have what we need
-      }
+    window.addEventListener('load', function() {
+      const observer = new MutationObserver((mutations, obs) => {
+        const gradioLoaded = document.querySelector('gradio-app');
+        if (gradioLoaded) {
+          document.getElementById('loader-overlay').style.display = 'none';
+          obs.disconnect(); // Stop observing once we have what we need
+        }
+      });
+
+      observer.observe(document.body, {
+        childList: true,
+        subtree: true
+      });
     });
-
-    observer.observe(document.body, {
-      childList: true,
-      subtree: true
-    });
-  });
-  
-</script>
-<script type="module" src="https://gradio.s3-us-west-2.amazonaws.com/4.18.0/gradio.js"></script>
+  </script>
+  <script type="module" src="https://gradio.s3-us-west-2.amazonaws.com/4.18.0/gradio.js"></script>
 </body>
 </html>
