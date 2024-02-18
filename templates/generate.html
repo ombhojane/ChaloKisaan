@@ -32,15 +32,15 @@
         </div>
       </nav>
 
-        <div class="container mx-auto px-4 py-8">
-            <h2 class="text-xl font-bold text-green-600">
+        <div class="container mx-auto px-4 py-8 max-w-3xl">
+          <h2 class="text-2xl font-bold text-green-600 mb-4">
                 Agrotourism Service Description Generator
             </h2>
-            <form method="post" class="mt-4">
+            <form method="post" class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
               <input type="hidden" name="current_section" value="{{ current_section }}">
               <input type="hidden" name="service_name" value="{{ service_name }}">
                   <div class="form-section">
-                      <label for="service_name" class="block text-gray-700 text-sm font-bold mb-2">Enter the Agrotourism Service Name:</label>
+                    <label for="service_name" class="block text-gray-700 text-sm font-bold mb-2">Enter the Agrotourism Service Name:</label>
                       
                       <input type="text" id="service_name" name="service_name" required class="form-input" />
                   </div>
@@ -97,7 +97,7 @@
                       </div>
                   </div>
       
-                  <input type="submit" value="Start Generation" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline cursor-pointer" />
+                  <input type="submit" value="Start Generation" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline cursor-pointer w-full " />
                 </form>
 
               
@@ -111,5 +111,11 @@
         </div>
     </div>
     <script src="../static/predict.js"></script>
+    <script>
+      function toggleMenu() {
+        var navigation = document.querySelector('.nav-links');
+        navigation.classList.toggle('mobile-menu');
+      }
+    </script>
 </body>
 </html>
