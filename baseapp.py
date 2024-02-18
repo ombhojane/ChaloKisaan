@@ -8,27 +8,13 @@ app.secret_key = os.urandom(24)
 API_KEY = os.getenv('GENAI_API_KEY')
 genai.configure(api_key=API_KEY)
 
-def create_complete_prompt(form_data):
-    # Combine all aspects into a single prompt
-    service_name = form_data.get('service_name', 'a service')
-    land_size = form_data.get('land_size', 'not specified')
-    biodiversity = form_data.get('biodiversity', 'not specified')
-    budget = form_data.get('budget', 'not specified')
-    infrastructure = ", ".join(form_data.get('infrastructure', ['not specified']))
-    
-    prompt = (f"Generate a comprehensive overview for {service_name}, including a catchy title, description, business model (covering revenue streams, cost structure, target market), setup process (planning to execution steps), and detailed budget breakdown. Consider land size of {land_size} hectares, biodiversity type {biodiversity}, budget of INR {budget}, and existing infrastructure: {infrastructure}.")
-    return prompt
-
-
-def generate_description(form_data):
-    prompt = create_complete_prompt(form_data)
+def generate_description(prompt_parts, generation_config, safety_settings):
     model = genai.GenerativeModel(model_name="gemini-pro",
-                                  generation_config=get_generation_config(),
-                                  safety_settings=get_safety_settings())
-    response = model.generate_content([prompt])
+                                  generation_config=generation_config,
+                                  safety_settings=safety_settings)
+    response = model.generate_content(prompt_parts)
     clean_response = response.text.replace("**", "")
     return clean_response
-
 
 def get_generation_config():
     return {
@@ -47,8 +33,18 @@ def get_safety_settings():
     ]
 
 def format_response(response):
-    # Format the response for display on the website
-    return response.replace("\n", "<br>")
+    # Convert markdown bullet points and bold text to HTML
+    response = response.replace("**", "<strong>").replace("<strong>", "</strong>", 1)  # Bold
+    lines = response.split('\n')
+    formatted_lines = []
+    for line in lines:
+        if line.startswith('- ') or line.isdigit():  # Bullet points or numerical points
+            formatted_lines.append(f"<li>{line[2:] if line.startswith('- ') else line}</li>")
+        else:
+            formatted_lines.append(line)
+    formatted_response = "<ul>" + "\n".join(formatted_lines) + "</ul>" if formatted_lines else response
+    return formatted_response.replace("<ul></ul>", "")  # Remove empty list tags
+
 
 
 @app.route('/visualize')
@@ -74,6 +70,8 @@ def pedict():
 def generate():
     # Initialize or get current section and form data from session
     if request.method == 'POST':
+        current_section = request.form.get('current_section', session.get('form_data', {}).get('current_section', 'description'))
+       # Ensure form_data is updated or initialized correctly
         form_data = {
             'service_name': request.form['service_name'],
             'land_size': request.form.get('land_size', 'N/A'),
@@ -81,17 +79,71 @@ def generate():
             'budget': request.form.get('budget', 'N/A'),
             'infrastructure': request.form.getlist('infrastructure[]'),
         }
+        session['form_data'] = form_data
 
-        response = generate_description(form_data)
+        # Initialize or get sections from session
+        sections = session.get('sections', [])
+        if sections:
+            # Determine the current section from the last entry in sections
+            current_section = sections[-1]['name']
+        else:
+            # Default to starting with 'description'
+            current_section = 'description'
+
+        # Determine next section
+        section_order = ['description', 'business_model', 'setup_process', 'budget']
+        
+
+        current_index = section_order.index(current_section)
+
+        if 'accept' in request.form:
+            # If accepting current section, move to next unless at the end
+            accepted_sections = session.get('accepted_sections', [])
+            # Add the current section and its data to the accepted_sections list
+            accepted_sections.append(session['form_data'])
+            session['accepted_sections'] = accepted_sections
+            if current_section == section_order[-1]:
+                # Redirect to a new URL to display the saved info if this is the last section
+                return redirect(url_for('display_saved_info'))
+            else:
+                # Move to the next section if not the last
+                next_section_index = current_index + 1
+                current_section = section_order[next_section_index]
+                session['form_data']['current_section'] = current_section
+            
+        elif 'regenerate' in request.form:
+            # If regenerating, stay on current_section
+            pass  # current_section remains the same
+        else:
+            # Handling for generating the first section or when not accepting/regenerating
+            if not sections:  # If starting fresh
+                current_section = 'description'
+
+        # Generate content for the current or next section
+        prompt = create_prompt_template(current_section)
+        response = generate_description(prompt, get_generation_config(), get_safety_settings())
         formatted_response = format_response(response)
-        
-        # Directly save the generated content without needing to track progress
-        session['generated_content'] = formatted_response
-        
-        return render_template('generate.html', generated_content=formatted_response, service_name=form_data['service_name'])
+
+        # Update sections list appropriately
+        if 'accept' in request.form and sections:
+            # Replace last section content if regenerating; otherwise, append new section
+            sections[-1] = {'name': current_section, 'content': formatted_response}
+        else:
+            sections.append({'name': current_section, 'content': formatted_response})
+
+        # Save updated sections and form_data back to session
+        session['sections'] = sections
+
+        # Calculate progress for UI feedback
+        progress = (current_index + 1) / len(section_order) * 100
+
+
+        # Render the template with updated context
+        return render_template('generate.html', sections=sections, current_section=current_section, service_name=form_data['service_name'], progress=progress)
     else:
-        return render_template('generate.html', generated_content=None, service_name='')
-    
+        # Clear the session for a new start and render the initial form
+        session.clear()
+        return render_template('generate.html', sections=[], current_section='description', service_name='', progress=0)
 
 def calculate_progress(sections, section_order):
     # Calculate the progress based on sections completed
