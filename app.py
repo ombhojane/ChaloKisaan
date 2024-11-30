@@ -22,9 +22,14 @@ def create_complete_prompt(form_data):
 
 def generate_description(form_data):
     prompt = create_complete_prompt(form_data)
-    model = genai.GenerativeModel(model_name="gemini-pro",
-                                  generation_config=get_generation_config(),
-                                  safety_settings=get_safety_settings())
+    model = genai.GenerativeModel(model_name="gemini-1.5-pro",
+                                  generation_config={
+                                            "temperature": 0.9,
+                                            "top_p": 1,
+                                            "top_k": 1,
+                                            "max_output_tokens": 2048,
+                                        }
+                                    )
     response = model.generate_content([prompt])
     clean_response = response.text.replace("**", "")
     return clean_response
