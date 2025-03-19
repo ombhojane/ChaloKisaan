@@ -7,22 +7,50 @@
 <script src="https://cdn.tailwindcss.com"></script>
 <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
-<link rel="stylesheet" href="../static/predict.css" /> 
 <link rel="stylesheet" href="../static/styles.css" />
-<script src="../static/predict.js"></script>
-<meta name="description" content="Chalo Kisaan - Bringing AI-powered agrotourism planning to Indian farms.">
 <style>
   .footer {
-    background-color: #f0f9ff; /* Footer background to match the theme */
-    color: #333333; /* Footer text color */
+    background-color: #f0f9ff;
+    color: #333333;
     padding: 20px 0;
     text-align: center;
+  }
+  .form-container {
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    padding: 2rem;
+    margin-top: 2rem;
+  }
+  .form-input {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #e2e8f0;
+    border-radius: 4px;
+    margin-top: 0.5rem;
+  }
+  .submit-button {
+    background-color: #15803d;
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border-radius: 4px;
+    font-weight: 600;
+    transition: background-color 0.2s;
+  }
+  .submit-button:hover {
+    background-color: #166534;
+  }
+  .result-container {
+    margin-top: 2rem;
+    padding: 1.5rem;
+    border-radius: 8px;
+    background-color: #f0fdf4;
+    border: 1px solid #86efac;
   }
 </style>
 </head>
 <body>
   <div class="container mx-auto px-4 sm:px-6 lg:px-8">
-
     <!-- Navigation -->
     <nav class="flex justify-between items-center py-6">
       <a href="/" class="text-2xl font-bold text-gray-800">Chalo Kisaan</a>
@@ -36,58 +64,70 @@
       </div>
     </nav>
 
-<!-- Main Content -->
-<div class="container mx-auto px-4 py-8 text-center">
-  <h1 class="text-2xl sm:text-3xl md:text-4xl font-bold mb-4 sm:mb-6 md:mb-8 text-green-700">Bring Your Farm to Life with Chalo Kisaan</h1>
-  
-  <!-- New Description -->
- 
-  
-  <!-- The rest of the content including the image and the Gradio component -->
-  <div class="max-w-3xl mx-auto"> <!-- Container to control max width -->
-    <!-- Image container -->
-    <div class="mb-8"> <!-- Add margin bottom to separate from Gradio component -->
-      <img src="https://i.postimg.cc/MKVpG2Bf/planning.png" alt="Agrotourism Image" class="w-full h-auto mx-auto rounded-lg">
-    </div>
-
-    <div class="mt-4 text-green-700 max-w-3xl mx-auto text-left pb-1">
+    <!-- Main Content -->
+    <div class="container mx-auto px-4 py-8 text-center">
+      <h1 class="text-2xl sm:text-3xl md:text-4xl font-bold mb-4 sm:mb-6 md:mb-8 text-green-700">Bring Your Farm to Life with Chalo Kisaan</h1>
       
-      <p class="mb-4">
-        Want to earn extra income from your farm while still growing crops? Offering tourism services is now easier and smarter than ever with our Agrotourism Planner powered by artificial intelligence!
-      </p>
-      <p class="mb-4">
-        Simply provide basic details about your farm land like size, plant/animal diversity, budget etc. Our AI will explain any terms so it's simple to input the details.
-      </p>
-      <p class="mb-4">
-        Then our agrotourism-focused AI model analyzes these details and suggests the most suitable agrotourism services for your land out of hundreds of many options. This could be farm stays, camping sites, guided trails and more!
-      </p>
-      <p class="mb-4">
-        You'll get visual previews of services custom-fitted on your land so you can see the income potential. We'll also provide AI-generated guidance on investments, facilities, business model and setup process to set up recommended service.
-      </p>
-      <p class="mb-4">
-        It's fast, it's free and it's designed to help Indian farmers exactly like you turn your farms into profitable tourism destinations that you can feel proud of! Shall we get started?
-      </p>
-      <p class="mb-4">
-        Note: Please wait for the model to load below. It may take a few seconds. 
-      </p>
+      <div class="max-w-3xl mx-auto">
+        <div class="mb-8">
+          <img src="https://i.postimg.cc/MKVpG2Bf/planning.png" alt="Agrotourism Image" class="w-full h-auto mx-auto rounded-lg">
+        </div>
+
+        <!-- Form Container -->
+        <div class="form-container">
+          <h2 class="text-xl font-semibold mb-4 text-green-700">Find Your Perfect Agrotourism Service</h2>
+          <form id="predictionForm" class="text-left">
+            <div class="mb-4">
+              <label class="block text-gray-700">Land Size (acres)</label>
+              <input type="number" name="land_size" class="form-input" required min="0" step="0.1">
+            </div>
+            
+            <div class="mb-4">
+              <label class="block text-gray-700">Biodiversity</label>
+              <select name="biodiversity" class="form-input" required>
+                <option value="">Select Biodiversity</option>
+                <option value="Forest">Forest</option>
+                <option value="Hills">Hills</option>
+                <option value="Coastal">Coastal</option>
+                <option value="Plains">Plains</option>
+              </select>
+            </div>
+            
+            <div class="mb-4">
+              <label class="block text-gray-700">Budget (INR in Lakhs)</label>
+              <input type="number" name="budget" class="form-input" required min="0" step="0.1">
+            </div>
+            
+            <div class="mb-4">
+              <label class="block text-gray-700">Existing Infrastructure</label>
+              <select name="infrastructure" class="form-input" required>
+                <option value="">Select Infrastructure</option>
+                <option value="Tea Bungalow">Tea Bungalow</option>
+                <option value="Tent Accommodation">Tent Accommodation</option>
+                <option value="Cottage">Cottage</option>
+                <option value="Pond">Pond</option>
+                <option value="Storage Facility">Storage Facility</option>
+                <option value="Traditional House">Traditional House</option>
+              </select>
+            </div>
+            
+            <button type="submit" class="submit-button w-full">Get Recommendations</button>
+          </form>
+
+          <!-- Result Container (Hidden by default) -->
+          <div id="resultContainer" class="result-container hidden">
+            <h3 class="text-lg font-semibold mb-2 text-green-700">Recommended Service</h3>
+            <p id="predictionResult" class="text-gray-700"></p>
+          </div>
+        </div>
+      </div>
     </div>
-    <!-- Gradio component container, should be same width as image above -->
-    <div class="mt-4">
-      <gradio-app src="https://ombhojane-predictservice.hf.space"></gradio-app>
-    </div>
-  </div>
-</div>
-
-
-
-
 
     <!-- Footer -->
     <footer class="footer bg-green-50">
-      <p class="text-gray-800">&copy; 2024 Chalo Kisaan. All rights reserved.</p>
+      <p class="text-gray-800">&copy; 2025 Chalo Kisaan. All rights reserved.</p>
     </footer>
   </div>
-
 
   <script>
     function toggleMenu() {
@@ -95,8 +135,36 @@
       navigation.classList.toggle('mobile-menu');
     }
 
-   
+    document.getElementById('predictionForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      
+      const formData = new FormData(this);
+      const data = {
+        land_size: parseFloat(formData.get('land_size')),
+        biodiversity: formData.get('biodiversity'),
+        budget: parseFloat(formData.get('budget')),
+        infrastructure: formData.get('infrastructure')
+      };
+
+      try {
+        const response = await fetch('/predict_service', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data)
+        });
+
+        const result = await response.json();
+        
+        // Show result
+        document.getElementById('resultContainer').classList.remove('hidden');
+        document.getElementById('predictionResult').textContent = result.prediction;
+      } catch (error) {
+        console.error('Error:', error);
+        alert('An error occurred while getting the prediction. Please try again.');
+      }
+    });
   </script>
-  <script type="module" src="https://gradio.s3-us-west-2.amazonaws.com/4.18.0/gradio.js"></script>
 </body>
 </html>

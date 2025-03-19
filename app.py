@@ -1,12 +1,16 @@
-from flask import Flask, render_template, request, session, redirect, url_for
+from flask import Flask, render_template, request, session, redirect, url_for, jsonify
 import google.generativeai as genai
 import os
+from gradio_client import Client
 
 app = Flask(__name__)
 app.secret_key = os.urandom(24)  
 
 API_KEY = os.getenv('GENAI_API_KEY')
 genai.configure(api_key=API_KEY)
+
+# Initialize Gradio client
+gradio_client = Client("ombhojane/predictservice")
 
 def create_complete_prompt(form_data):
     # Combine all aspects into a single prompt
@@ -153,6 +157,23 @@ def create_prompt_template(current_section):
 
     return prompt
 
+@app.route('/predict_service', methods=['POST'])
+def predict_service():
+    try:
+        data = request.json
+        
+        # Call the Gradio API
+        result = gradio_client.predict(
+            data['land_size'],
+            data['biodiversity'],
+            data['budget'],
+            data['infrastructure'],
+            api_name="/predict"
+        )
+        
+        return jsonify({'prediction': result})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 if __name__ == '__main__':
     app.run(debug=True)
