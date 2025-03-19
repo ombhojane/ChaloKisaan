@@ -16,14 +16,187 @@
     <link rel="stylesheet" href="../static/styles.css" />
     
     <link rel="stylesheet" href="../static/predict.css" /> 
+    
+    <!-- PDF Generation Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <!-- jsPDF AutoTable plugin for better table rendering -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
 
     <style>
       .footer {
-    background-color: #f0f9ff; /* Footer background to match the theme */
-    color: #333; /* Footer text color */
-    padding: 20px 0;
-    text-align: center;
-  }
+        background-color: #f0f9ff; /* Footer background to match the theme */
+        color: #333; /* Footer text color */
+        padding: 20px 0;
+        text-align: center;
+      }
+      
+      /* Markdown styling */
+      .markdown-content h1 {
+        font-size: 1.8rem;
+        font-weight: bold;
+        margin-top: 1.5rem;
+        margin-bottom: 1rem;
+        color: #166534;
+      }
+      
+      .markdown-content h2 {
+        font-size: 1.5rem;
+        font-weight: bold;
+        margin-top: 1.2rem;
+        margin-bottom: 0.8rem;
+        color: #166534;
+      }
+      
+      .markdown-content h3 {
+        font-size: 1.3rem;
+        font-weight: bold;
+        margin-top: 1rem;
+        margin-bottom: 0.7rem;
+      }
+      
+      .markdown-content p {
+        margin-bottom: 1rem;
+        line-height: 1.6;
+      }
+      
+      .markdown-content ul, .markdown-content ol {
+        margin-left: 1.5rem;
+        margin-bottom: 1rem;
+      }
+      
+      .markdown-content ul {
+        list-style-type: disc;
+      }
+      
+      .markdown-content ol {
+        list-style-type: decimal;
+      }
+      
+      .markdown-content li {
+        margin-bottom: 0.5rem;
+      }
+      
+      .markdown-content strong {
+        font-weight: bold;
+      }
+      
+      .markdown-content em {
+        font-style: italic;
+      }
+      
+      .markdown-content blockquote {
+        border-left: 4px solid #16a34a;
+        padding-left: 1rem;
+        margin-left: 0;
+        margin-right: 0;
+        font-style: italic;
+        color: #4b5563;
+      }
+      
+      .markdown-content code {
+        font-family: monospace;
+        background-color: #f3f4f6;
+        padding: 0.2rem 0.4rem;
+        border-radius: 0.2rem;
+      }
+      
+      .markdown-content pre {
+        background-color: #f3f4f6;
+        padding: 1rem;
+        border-radius: 0.4rem;
+        overflow-x: auto;
+        margin-bottom: 1rem;
+      }
+      
+      /* Table styling */
+      .markdown-content table {
+        width: 100%;
+        margin-bottom: 1.5rem;
+        border-collapse: collapse;
+        overflow-x: auto;
+        display: block;
+      }
+      
+      .markdown-content table th,
+      .markdown-content table td {
+        padding: 0.75rem;
+        border: 1px solid #e5e7eb;
+        text-align: left;
+      }
+      
+      .markdown-content table th {
+        background-color: #f9fafb;
+        font-weight: bold;
+        color: #111827;
+      }
+      
+      .markdown-content table tr:nth-child(even) {
+        background-color: #f9fafb;
+      }
+      
+      .markdown-content table tr:hover {
+        background-color: #f3f4f6;
+      }
+      
+      @media (min-width: 768px) {
+        .markdown-content table {
+          display: table;
+        }
+      }
+      
+      /* PDF content styling */
+      .pdf-content {
+        font-family: 'Open Sans', sans-serif;
+        line-height: 1.6;
+      }
+      
+      /* Loading animation */
+      .loading {
+        display: inline-block;
+        position: relative;
+        width: 80px;
+        height: 80px;
+      }
+      .loading div {
+        position: absolute;
+        border: 4px solid #16a34a;
+        opacity: 1;
+        border-radius: 50%;
+        animation: loading 1s cubic-bezier(0, 0.2, 0.8, 1) infinite;
+      }
+      .loading div:nth-child(2) {
+        animation-delay: -0.5s;
+      }
+      @keyframes loading {
+        0% {
+          top: 36px;
+          left: 36px;
+          width: 0;
+          height: 0;
+          opacity: 0;
+        }
+        4.9% {
+          top: 36px;
+          left: 36px;
+          width: 0;
+          height: 0;
+          opacity: 0;
+        }
+        5% {
+          top: 36px;
+          left: 36px;
+          width: 0;
+          height: 0;
+          opacity: 1;
+        }
+        100% {
+          top: 0px;
+          left: 0px;
+          width: 72px;
+          height: 72px;
+          opacity: 0;
+        }
+      }
     </style>
   </head>     
 <body class="bg-gray-50 text-gray-800">
@@ -109,9 +282,18 @@
 
               
                 {% if generated_content %}
-                <div class="mt-8 p-4 shadow-lg rounded-lg bg-white">
-                    <h3 class="font-bold text-green-600">Generated Content for {{ service_name }}:</h3>
-                    <div class="mt-2 text-gray-600">{{ generated_content | safe }}</div>
+                <div class="mt-8 p-6 shadow-lg rounded-lg bg-white">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="font-bold text-green-600">Generated Content for {{ service_name }}:</h3>
+                        <button id="downloadPdf" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline flex items-center">
+                            <i class="fas fa-download mr-2"></i> Download PDF
+                        </button>
+                    </div>
+                    <div id="generatedContent" class="mt-2 text-gray-600 markdown-content">{{ generated_content | safe }}</div>
+                    <div id="pdfLoading" class="hidden text-center py-4">
+                        <div class="loading mx-auto"><div></div><div></div></div>
+                        <p class="text-gray-600 mt-2">Generating PDF...</p>
+                    </div>
                 </div>
                 {% endif %}
                 
@@ -128,5 +310,325 @@
         navigation.classList.toggle('mobile-menu');
       }
     </script>
+    
+    <!-- PDF generation script only loaded when content is available -->
+    {% if generated_content %}
+    <script>
+      // PDF Generation Script
+      window.jsPDF = window.jspdf.jsPDF;
+      
+      document.getElementById('downloadPdf').addEventListener('click', function() {
+        const pdfLoading = document.getElementById('pdfLoading');
+        const downloadBtn = document.getElementById('downloadPdf');
+        const content = document.getElementById('generatedContent');
+        const serviceName = "{{ service_name }}" || 'AgroService';
+        
+        // Show loading animation
+        pdfLoading.classList.remove('hidden');
+        downloadBtn.classList.add('opacity-50', 'cursor-not-allowed');
+        downloadBtn.disabled = true;
+        
+        setTimeout(() => {
+          try {
+            // Create PDF document with better quality settings
+            const pdf = new jsPDF({
+              orientation: 'p',
+              unit: 'pt',
+              format: 'a4',
+              putOnlyUsedFonts: true,
+              compress: true
+            });
+            
+            const pageWidth = pdf.internal.pageSize.getWidth();
+            const pageHeight = pdf.internal.pageSize.getHeight();
+            const margin = 40;
+            const effectiveWidth = pageWidth - (margin * 2);
+            
+            // Define theme colors
+            const primaryColor = '#166534';
+            const secondaryColor = '#16a34a';
+            const textColor = '#111827';
+            const lightGray = '#f9fafb';
+            
+            // Add logo/header
+            pdf.setFillColor(lightGray);
+            pdf.rect(0, 0, pageWidth, 80, 'F');
+            
+            // Add title
+            pdf.setFont('helvetica', 'bold');
+            pdf.setFontSize(20);
+            pdf.setTextColor(primaryColor);
+            
+            const title = 'Agrotourism Plan: ' + serviceName;
+            const titleWidth = pdf.getStringUnitWidth(title) * 20 / pdf.internal.scaleFactor;
+            const titleX = (pageWidth - titleWidth) / 2;
+            pdf.text(title, titleX, 45);
+            
+            // Add green line under the header
+            pdf.setDrawColor(secondaryColor);
+            pdf.setLineWidth(2);
+            pdf.line(margin, 80, pageWidth - margin, 80);
+            
+            // Create a content parser to organize and structure content
+            const contentDiv = document.createElement('div');
+            contentDiv.innerHTML = content.innerHTML;
+            
+            // Initialize content tracking
+            let currentY = 100;
+            let sections = [];
+            let currentSection = null;
+            let tableData = [];
+            let isProcessingTable = false;
+            
+            // First pass - identify sections and structure
+            function identifySections(node, depth = 0) {
+              if (node.nodeType === Node.ELEMENT_NODE) {
+                const tagName = node.tagName.toLowerCase();
+                
+                if (tagName === 'h1' || tagName === 'h2') {
+                  // New major section
+                  currentSection = {
+                    title: node.textContent.trim(),
+                    level: tagName === 'h1' ? 1 : 2,
+                    content: [],
+                    tables: []
+                  };
+                  sections.push(currentSection);
+                } else if (currentSection) {
+                  if (tagName === 'table') {
+                    // Capture table data for later rendering with autotable
+                    const tableObj = processTable(node);
+                    if (tableObj) {
+                      currentSection.tables.push(tableObj);
+                    }
+                  } else if (tagName !== 'thead' && tagName !== 'tbody' && tagName !== 'tr' && tagName !== 'th' && tagName !== 'td') {
+                    // Add other content to current section
+                    if (node.textContent.trim()) {
+                      currentSection.content.push({
+                        type: tagName,
+                        text: node.textContent.trim(),
+                        element: node
+                      });
+                    }
+                  }
+                }
+                
+                // Process children recursively
+                for (let i = 0; i < node.childNodes.length; i++) {
+                  identifySections(node.childNodes[i], depth + 1);
+                }
+              }
+            }
+            
+            // Process tables to extract data for autotable
+            function processTable(tableNode) {
+              const headerRow = tableNode.querySelector('thead tr');
+              if (!headerRow) return null;
+              
+              const headers = Array.from(headerRow.querySelectorAll('th')).map(th => th.textContent.trim());
+              const rows = Array.from(tableNode.querySelectorAll('tbody tr')).map(tr => 
+                Array.from(tr.querySelectorAll('td')).map(td => td.textContent.trim())
+              );
+              
+              // Find table title (usually h3 before table)
+              let tableTitle = '';
+              let prevSibling = tableNode.previousElementSibling;
+              if (prevSibling && (prevSibling.tagName.toLowerCase() === 'h3' || prevSibling.tagName.toLowerCase() === 'h4')) {
+                tableTitle = prevSibling.textContent.trim();
+              }
+              
+              return {
+                title: tableTitle,
+                headers: headers,
+                rows: rows
+              };
+            }
+            
+            // Identify all sections in the content
+            identifySections(contentDiv);
+            
+            // Function to add a page break if needed
+            function checkPageBreak(requiredSpace) {
+              if (currentY + requiredSpace > pageHeight - 50) {
+                pdf.addPage();
+                
+                // Add header to new page
+                pdf.setFillColor(lightGray);
+                pdf.rect(0, 0, pageWidth, 40, 'F');
+                
+                // Add title to new page header
+                pdf.setFont('helvetica', 'bold');
+                pdf.setFontSize(12);
+                pdf.setTextColor(primaryColor);
+                pdf.text(title, margin, 25);
+                
+                // Add line under header
+                pdf.setDrawColor(secondaryColor);
+                pdf.setLineWidth(1);
+                pdf.line(margin, 40, pageWidth - margin, 40);
+                
+                currentY = 60;
+                return true;
+              }
+              return false;
+            }
+            
+            // Second pass - render sections with proper spacing and formatting
+            for (let i = 0; i < sections.length; i++) {
+              const section = sections[i];
+              
+              // Section title
+              checkPageBreak(40);
+              pdf.setFont('helvetica', 'bold');
+              pdf.setFontSize(section.level === 1 ? 16 : 14);
+              pdf.setTextColor(primaryColor);
+              pdf.text(section.title, margin, currentY);
+              currentY += 20;
+              
+              // Section content
+              pdf.setFont('helvetica', 'normal');
+              pdf.setFontSize(12);
+              pdf.setTextColor(textColor);
+              
+              for (let j = 0; j < section.content.length; j++) {
+                const contentItem = section.content[j];
+                
+                if (contentItem.type === 'p') {
+                  // Paragraphs
+                  checkPageBreak(20);
+                  const textLines = pdf.splitTextToSize(contentItem.text, effectiveWidth);
+                  pdf.text(textLines, margin, currentY);
+                  currentY += textLines.length * 16 + 8;
+                } else if (contentItem.type === 'h3') {
+                  // Subheadings
+                  checkPageBreak(25);
+                  pdf.setFont('helvetica', 'bold');
+                  pdf.setFontSize(13);
+                  pdf.text(contentItem.text, margin, currentY);
+                  pdf.setFont('helvetica', 'normal');
+                  pdf.setFontSize(12);
+                  currentY += 20;
+                } else if (contentItem.type === 'ul' || contentItem.type === 'ol') {
+                  // Lists
+                  const listItems = contentItem.element.querySelectorAll('li');
+                  for (let k = 0; k < listItems.length; k++) {
+                    checkPageBreak(20);
+                    const bullet = contentItem.type === 'ol' ? (k + 1) + '. ' : '• ';
+                    const itemText = bullet + listItems[k].textContent.trim();
+                    const textLines = pdf.splitTextToSize(itemText, effectiveWidth - 10);
+                    pdf.text(textLines, margin + 10, currentY);
+                    currentY += textLines.length * 16 + 4;
+                  }
+                  currentY += 5;
+                }
+              }
+              
+              // Render tables for this section using autotable
+              for (let j = 0; j < section.tables.length; j++) {
+                const tableObj = section.tables[j];
+                
+                // Add table title if available
+                if (tableObj.title) {
+                  checkPageBreak(25);
+                  pdf.setFont('helvetica', 'bold');
+                  pdf.setFontSize(13);
+                  pdf.text(tableObj.title, margin, currentY);
+                  currentY += 20;
+                  pdf.setFont('helvetica', 'normal');
+                  pdf.setFontSize(12);
+                }
+                
+                // Check if we need a page break before the table
+                const tableHeight = (tableObj.rows.length + 1) * 20 + 10; // Estimate table height
+                checkPageBreak(tableHeight);
+                
+                // Create table using autotable
+                pdf.autoTable({
+                  startY: currentY,
+                  head: [tableObj.headers],
+                  body: tableObj.rows,
+                  margin: { left: margin, right: margin },
+                  headStyles: {
+                    fillColor: [22, 101, 52], // Convert to RGB
+                    textColor: [255, 255, 255],
+                    fontStyle: 'bold',
+                    halign: 'left'
+                  },
+                  alternateRowStyles: {
+                    fillColor: [249, 250, 251] // Light gray for alternate rows
+                  },
+                  styles: {
+                    font: 'helvetica',
+                    fontSize: 10,
+                    cellPadding: 6,
+                    lineColor: [229, 231, 235]
+                  },
+                  columnStyles: {
+                    0: { fontStyle: 'bold' } // Make first column bold
+                  },
+                  didDrawPage: function(data) {
+                    // Add header to new pages
+                    pdf.setFillColor(lightGray);
+                    pdf.rect(0, 0, pageWidth, 40, 'F');
+                    
+                    pdf.setFont('helvetica', 'bold');
+                    pdf.setFontSize(12);
+                    pdf.setTextColor(primaryColor);
+                    pdf.text(title, margin, 25);
+                    
+                    pdf.setDrawColor(secondaryColor);
+                    pdf.setLineWidth(1);
+                    pdf.line(margin, 40, pageWidth - margin, 40);
+                  }
+                });
+                
+                // Update current Y position based on where autotable finished
+                currentY = pdf.previousAutoTable.finalY + 20;
+              }
+              
+              // Add space after section
+              currentY += 10;
+            }
+            
+            // Add footer to all pages
+            const totalPages = pdf.internal.getNumberOfPages();
+            for (let i = 1; i <= totalPages; i++) {
+              pdf.setPage(i);
+              
+              // Footer line
+              pdf.setDrawColor('#e5e7eb');
+              pdf.setLineWidth(0.5);
+              pdf.line(margin, pageHeight - 30, pageWidth - margin, pageHeight - 30);
+              
+              // Footer text
+              pdf.setFontSize(9);
+              pdf.setTextColor('#6b7280');
+              pdf.setFont('helvetica', 'normal');
+              
+              const footerText = 'Generated by Chalo Kisaan | www.chalokisaan.com';
+              const footerWidth = pdf.getStringUnitWidth(footerText) * 9 / pdf.internal.scaleFactor;
+              const footerX = (pageWidth - footerWidth) / 2;
+              pdf.text(footerText, footerX, pageHeight - 15);
+              
+              // Page numbers
+              pdf.text('Page ' + i + ' of ' + totalPages, pageWidth - margin - 60, pageHeight - 15);
+            }
+            
+            // Save the PDF
+            pdf.save(serviceName.replace(/\s+/g, '-').toLowerCase() + '-agrotourism-plan.pdf');
+            
+          } catch (err) {
+            console.error('Error generating PDF:', err);
+            alert('There was an error generating the PDF. Please try again.');
+          }
+          
+          // Hide loading animation
+          pdfLoading.classList.add('hidden');
+          downloadBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+          downloadBtn.disabled = false;
+        }, 500);
+      });
+    </script>
+    {% endif %}
 </body>
 </html>

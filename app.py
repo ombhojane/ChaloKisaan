@@ -1,13 +1,18 @@
 from flask import Flask, render_template, request, session, redirect, url_for, jsonify
-import google.generativeai as genai
 import os
+from google import genai
+from google.genai import types
 from gradio_client import Client
+import markdown
+from markdown.extensions.tables import TableExtension
+from markdown.extensions.attr_list import AttrListExtension
+from markdown.extensions.fenced_code import FencedCodeExtension
 
 app = Flask(__name__)
 app.secret_key = os.urandom(24)  
 
-API_KEY = os.getenv('GENAI_API_KEY')
-genai.configure(api_key=API_KEY)
+# Configure Gemini API
+genai.configure(api_key=os.environ.get("GEMINI_API_KEY"))
 
 # Initialize Gradio client
 gradio_client = Client("ombhojane/predictservice")
@@ -20,32 +25,41 @@ def create_complete_prompt(form_data):
     budget = form_data.get('budget', 'not specified')
     infrastructure = ", ".join(form_data.get('infrastructure', ['not specified']))
     
-    prompt = (f"Generate a comprehensive overview for {service_name}, including a catchy title, description, business model (covering revenue streams, cost structure, target market), setup process (planning to execution steps), and detailed budget breakdown. Consider land size of {land_size} acers, biodiversity type {biodiversity}, budget of INR {budget}, and existing infrastructure: {infrastructure}.")
+    prompt = (f"Generate a comprehensive overview for {service_name}, including a catchy title, description, business model (covering revenue streams, cost structure, target market), setup process (planning to execution steps), and detailed budget breakdown. Consider land size of {land_size} acers, biodiversity type {biodiversity}, budget of INR {budget}, and existing infrastructure: {infrastructure}. Format the budget section as a markdown table.")
     return prompt
 
 
 def generate_description(form_data):
     prompt = create_complete_prompt(form_data)
-    model = genai.GenerativeModel(model_name="gemini-1.5-pro",
-                                  generation_config={
-                                            "temperature": 0.9,
-                                            "top_p": 1,
-                                            "top_k": 1,
-                                            "max_output_tokens": 2048,
-                                        }
-                                    )
-    response = model.generate_content([prompt])
-    clean_response = response.text.replace("**", "")
-    return clean_response
+    
+    client = genai.Client(api_key=os.environ.get("GEMINI_API_KEY"))
+    
+    model = "gemini-2.0-flash-thinking-exp-01-21"
+    contents = [
+        types.Content(
+            role="user",
+            parts=[
+                types.Part.from_text(text=prompt),
+            ],
+        ),
+    ]
+    
+    generate_content_config = types.GenerateContentConfig(
+        temperature=0.4,
+        top_p=0.95,
+        top_k=64,
+        max_output_tokens=8192,
+        response_mime_type="text/plain",
+    )
+    
+    response = client.models.generate_content(
+        model=model,
+        contents=contents,
+        config=generate_content_config,
+    )
+    
+    return response.text
 
-
-def get_generation_config():
-    return {
-        "temperature": 0.9,
-        "top_p": 1,
-        "top_k": 1,
-        "max_output_tokens": 2048,
-    }
 
 def get_safety_settings():
     return [
@@ -56,8 +70,20 @@ def get_safety_settings():
     ]
 
 def format_response(response):
-    # Format the response for display on the website
-    return response.replace("\n", "<br>")
+    # Clean up any double asterisks that are not properly spaced for markdown
+    response = response.replace('**', ' **').replace('** ', '** ').replace('  **', ' **').replace('**  ', '** ')
+    
+    # Ensure consistent table formatting
+    response = response.replace('|---', '| ---')
+    
+    # Convert markdown to HTML with table support and other extensions
+    extensions = [
+        TableExtension(),
+        AttrListExtension(),
+        FencedCodeExtension()
+    ]
+    html = markdown.markdown(response, extensions=extensions)
+    return html
 
 
 @app.route('/visualize')
@@ -129,32 +155,14 @@ def create_prompt_template(current_section):
     budget = form_data.get('budget', 'not specified')
     infrastructure = ", ".join(form_data.get('infrastructure', ['not specified']))
 
-    # Construct the prompt based on the current section
-    if current_section == 'description':
-        prompt = (f"Create a catchy title and a simple, engaging description for {service_name}, "
-                  f"considering its land size is {land_size} acers, biodiversity type is {biodiversity}, "
-                  f"budget is INR {budget}, and existing infrastructure includes {infrastructure}.")
-                  
-    elif current_section == 'business_model':
-        prompt = (f"Outline a business model for {service_name} in bullet points, including revenue streams, "
-                  f"cost structure, and target market. Consider its land size of {land_size} acers, "
-                  f"biodiversity type {biodiversity}, budget of INR {budget}, "
-                  f"and existing infrastructure: {infrastructure}.")
-                  
-    elif current_section == 'setup_process':
-        prompt = (f"Describe the setup process for {service_name} in a step-by-step format. Include necessary steps "
-                  f"from planning to execution, considering a land size of {land_size} acers, "
-                  f"biodiversity type {biodiversity}, a budget of INR {budget}, "
-                  f"and infrastructure like {infrastructure}.")
-                  
-    elif current_section == 'budget':
-        prompt = (f"Provide a detailed budget breakdown for {service_name}, listing key expenses and estimated costs "
-                  f"in INR. Consider aspects such as land size of {land_size} acers, biodiversity type {biodiversity}, "
-                  f"and planned infrastructure: {infrastructure}. Format the response as 'Item: Cost'.")
-                  
-    else:
-        prompt = "Please provide detailed information based on the user's inputs."
-
+    prompt = f"""Create a catchy title and a simple, engaging description for {service_name}, 
+                considering its land size is {land_size} acres, biodiversity type is {biodiversity}, 
+                budget is INR {budget}, and existing infrastructure includes {infrastructure}. 
+                Outline a business model for {service_name} in bullet points, including revenue streams, 
+                cost structure, and target market. Describe the setup process for {service_name} in a step-by-step format. 
+                Provide a detailed budget breakdown for {service_name}, listing key expenses and estimated costs in INR. 
+                Format the budget breakdown as a markdown table."""
+    
     return prompt
 
 @app.route('/predict_service', methods=['POST'])
