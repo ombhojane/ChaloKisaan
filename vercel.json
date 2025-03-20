@@ -1,21 +1,15 @@
 {
     "version": 2,
-    "builds": [
-        {
-            "src": "./index.py",
-            "use": "@vercel/python",
-            "config": {"runtime": "python3.6"}
+    "functions": {
+        "./app.py": {
+            "memory": 1024,
+            "maxDuration": 60
         }
-    ],
+    },
     "routes": [
         {
             "src": "/(.*)",
             "dest": "/"
         }
-    ],
-    "functions": {
-        "./index.py": {
-            "maxDuration": 60
-        }
-    }
+    ]
 }
