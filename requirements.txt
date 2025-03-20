@@ -4,3 +4,5 @@ markdown
 flask-cors
 werkzeug
 google-genai
+gunicorn
+google-generativeai
