@@ -1,8 +1,6 @@
-flask
-gradio-client
-markdown
-flask-cors
-werkzeug
-google-genai
-gunicorn
+Flask
 google-generativeai
+gunicorn
+markdown
+gradio-client
+google-genai
