@@ -11,8 +11,6 @@ from markdown.extensions.fenced_code import FencedCodeExtension
 app = Flask(__name__)
 app.secret_key = os.urandom(24)  
 
-# Configure Gemini API
-genai.configure(api_key=os.environ.get("GEMINI_API_KEY"))
 
 # Initialize Gradio client
 gradio_client = Client("ombhojane/predictservice")
@@ -70,8 +68,8 @@ def get_safety_settings():
     ]
 
 def format_response(response):
-    # Clean up any double asterisks that are not properly spaced for markdown
-    response = response.replace('**', ' **').replace('** ', '** ').replace('  **', ' **').replace('**  ', '** ')
+    # Don't modify the double asterisks for bold text
+    # response = response.replace('**', ' **').replace('** ', '** ').replace('  **', ' **').replace('**  ', '** ')
     
     # Ensure consistent table formatting
     response = response.replace('|---', '| ---')
@@ -90,10 +88,6 @@ def format_response(response):
 def visualize():
     return render_template('visualize.html')
 
-@app.route('/docs')
-def docs():
-    return render_template('docs.html')
-
 @app.route('/')
 def index():
     session.clear()  # Clear session at the start
@@ -107,7 +101,6 @@ def pedict():
 
 @app.route('/generate', methods=['GET', 'POST'])
 def generate():
-    # Initialize or get current section and form data from session
     if request.method == 'POST':
         print("Service Name Received:", request.form['service_name'])
 
@@ -122,48 +115,13 @@ def generate():
         response = generate_description(form_data)
         formatted_response = format_response(response)
         
-        # Directly save the generated content without needing to track progress
+        # Directly save the generated content
         session['generated_content'] = formatted_response
         
         return render_template('generate.html', generated_content=formatted_response, service_name=form_data['service_name'])
     else:
         return render_template('generate.html', generated_content=None, service_name='')
     
-
-def calculate_progress(sections, section_order):
-    # Calculate the progress based on sections completed
-    completed_sections = len(sections)
-    total_sections = len(section_order)
-    progress = int((completed_sections / total_sections) * 100)
-    return progress
-
-@app.route('/saved_info')
-def display_saved_info():
-    # Fetch the saved information from the session
-    accepted_sections = session.get('accepted_sections', [])
-    # Render a template to display the saved information
-    return render_template('saved_info.html', accepted_sections=accepted_sections)
-
-def create_prompt_template(current_section):
-    # Retrieve form data from the session
-    form_data = session.get('form_data', {})
-    
-    # Default values for missing data
-    service_name = form_data.get('service_name', 'a service')
-    land_size = form_data.get('land_size', 'not specified')
-    biodiversity = form_data.get('biodiversity', 'not specified')
-    budget = form_data.get('budget', 'not specified')
-    infrastructure = ", ".join(form_data.get('infrastructure', ['not specified']))
-
-    prompt = f"""Create a catchy title and a simple, engaging description for {service_name}, 
-                considering its land size is {land_size} acres, biodiversity type is {biodiversity}, 
-                budget is INR {budget}, and existing infrastructure includes {infrastructure}. 
-                Outline a business model for {service_name} in bullet points, including revenue streams, 
-                cost structure, and target market. Describe the setup process for {service_name} in a step-by-step format. 
-                Provide a detailed budget breakdown for {service_name}, listing key expenses and estimated costs in INR. 
-                Format the budget breakdown as a markdown table."""
-    
-    return prompt
 
 @app.route('/predict_service', methods=['POST'])
 def predict_service():
