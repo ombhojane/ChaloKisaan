@@ -276,6 +276,26 @@
                           <label><input type="checkbox" name="infrastructure[]" value="Traditional House" class="form-checkbox mr-2">Traditional House</label>
                       </div>
                   </div>
+                  
+                  <div class="form-section">
+                      <label class="font-semibold text-lg mb-2 block">Language</label>
+                      <select name="language" id="languageSelect" class="form-select" aria-label="Language" onchange="toggleCustomLanguage()">
+                          <option value="English">English</option>
+                          <option value="Hindi">Hindi</option>
+                          <option value="Marathi">Marathi</option>
+                          <option value="Tamil">Tamil</option>
+                          <option value="Telugu">Telugu</option>
+                          <option value="Bengali">Bengali</option>
+                          <option value="Gujarati">Gujarati</option>
+                          <option value="Kannada">Kannada</option>
+                          <option value="Malayalam">Malayalam</option>
+                          <option value="Punjabi">Punjabi</option>
+                          <option value="other">Other (Specify)</option>
+                      </select>
+                      <div id="customLanguageContainer" class="mt-2 hidden">
+                          <input type="text" id="customLanguage" name="custom_language" class="form-input" placeholder="Enter your preferred language">
+                      </div>
+                  </div>
       
                   <input type="submit" value="Start Generation" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline cursor-pointer w-full " />
                 </form>
@@ -287,6 +307,16 @@
                         <button id="downloadPdf" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline flex items-center">
                             <i class="fas fa-download mr-2"></i> Download PDF
                         </button>
+                        {% if language and language != 'English' %}
+                        <div class="text-sm text-gray-600 italic">
+                            <i class="fas fa-language mr-1"></i> 
+                            {% if language in ['Hindi', 'Marathi', 'Tamil', 'Telugu', 'Bengali', 'Gujarati', 'Kannada', 'Malayalam', 'Punjabi'] %}
+                                Content in {{ language }}
+                            {% else %}
+                                Content in custom language: {{ language }}
+                            {% endif %}
+                        </div>
+                        {% endif %}
                     </div>
                     <div id="generatedContent" class="mt-2 text-gray-600 markdown-content">{{ generated_content | safe }}</div>
                     <div id="pdfLoading" class="hidden text-center py-4">
@@ -308,6 +338,21 @@
         var navigation = document.querySelector('.nav-links');
         navigation.classList.toggle('mobile-menu');
       }
+      
+      function toggleCustomLanguage() {
+        const languageSelect = document.getElementById('languageSelect');
+        const customLanguageContainer = document.getElementById('customLanguageContainer');
+        const customLanguageInput = document.getElementById('customLanguage');
+        
+        if (languageSelect.value === 'other') {
+          customLanguageContainer.classList.remove('hidden');
+          customLanguageInput.setAttribute('required', 'required');
+        } else {
+          customLanguageContainer.classList.add('hidden');
+          customLanguageInput.removeAttribute('required');
+          customLanguageInput.value = '';
+        }
+      }
     </script>
     
     <!-- PDF generation script only loaded when content is available -->
@@ -316,11 +361,46 @@
       // PDF Generation Script
       window.jsPDF = window.jspdf.jsPDF;
       
+      // Set language selection on page load if showing results
+      document.addEventListener('DOMContentLoaded', function() {
+        const language = "{{ language }}";
+        const languageSelect = document.getElementById('languageSelect');
+        const customLanguageContainer = document.getElementById('customLanguageContainer');
+        const customLanguageInput = document.getElementById('customLanguage');
+        
+        // Check if the language is in the predefined list
+        let languageFound = false;
+        for (let i = 0; i < languageSelect.options.length; i++) {
+          if (languageSelect.options[i].value === language && language !== 'other') {
+            languageSelect.selectedIndex = i;
+            languageFound = true;
+            break;
+          }
+        }
+        
+        // If language is not in the list, set to "other" and fill in custom field
+        if (!languageFound && language !== 'English') {
+          // Find the "other" option
+          for (let i = 0; i < languageSelect.options.length; i++) {
+            if (languageSelect.options[i].value === 'other') {
+              languageSelect.selectedIndex = i;
+              break;
+            }
+          }
+          
+          // Show and fill the custom language field
+          customLanguageContainer.classList.remove('hidden');
+          customLanguageInput.value = language;
+        }
+      });
+      
       document.getElementById('downloadPdf').addEventListener('click', function() {
         const pdfLoading = document.getElementById('pdfLoading');
         const downloadBtn = document.getElementById('downloadPdf');
         const content = document.getElementById('generatedContent');
         const serviceName = "{{ service_name }}" || 'AgroService';
+        const language = "{{ language }}" || 'English';
+        const isCustomLanguage = !["English", "Hindi", "Marathi", "Tamil", "Telugu", "Bengali", "Gujarati", "Kannada", "Malayalam", "Punjabi"].includes(language);
         
         // Show loading animation
         pdfLoading.classList.remove('hidden');
@@ -362,6 +442,14 @@
             const titleWidth = pdf.getStringUnitWidth(title) * 20 / pdf.internal.scaleFactor;
             const titleX = (pageWidth - titleWidth) / 2;
             pdf.text(title, titleX, 45);
+            
+            // Add language info if not English
+            if (language && language !== 'English') {
+              pdf.setFontSize(10);
+              pdf.setTextColor(secondaryColor);
+              const langText = isCustomLanguage ? 'Content in custom language: ' + language : 'Content in ' + language;
+              pdf.text(langText, pageWidth - margin - pdf.getStringUnitWidth(langText) * 10 / pdf.internal.scaleFactor, 65);
+            }
             
             // Add green line under the header
             pdf.setDrawColor(secondaryColor);

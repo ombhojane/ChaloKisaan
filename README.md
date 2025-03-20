@@ -11,23 +11,58 @@ Chalo Kisaan is an agrotourism service predictor that helps farmers generate pot
 3. **Service Description**: Farmers can choose a service name and tailor the agrotourism service according to their preferences.
 Google's Gemini Pro LLM provides a brief description of the business model, budget estimations and other essential details for the selected service.
 
-## How to Setup
+## Deployment Instructions for Vercel
 
-To run the Chalo Kisaan app locally, follow these steps:
+### Project Structure
+This project is now structured for deployment on Vercel:
 
-1. **Install Dependencies**: Install the required libraries by running the following command:
-   
-   pip install -r requirements.txt
+- `api/index.py`: Serverless function entry point
+- `app.py`: Main Flask application
+- `vercel.json`: Configuration for Vercel deployment
+- `requirements.txt`: Dependencies
 
-2. **Set up Environment Variables**: Create a `.env` file in the project's root directory and replace the `GENAI_API_KEY` placeholder with your actual Gemini API key:
-   
-   GENAI_API_KEY=your_gemini_api_key
+### To Deploy
 
-3. **Run the App**: Start the Flask app by running the following command:
-   
-   python app.py
+1. Make sure you have the Vercel CLI installed:
+   ```
+   npm install -g vercel
+   ```
 
-This will start the app on `http://127.0.0.1:5000/` in your local environment.
+2. Login to Vercel:
+   ```
+   vercel login
+   ```
+
+3. Deploy the project:
+   ```
+   vercel
+   ```
+
+4. For production deployment:
+   ```
+   vercel --prod
+   ```
+
+### Environment Variables
+
+Make sure to set the required environment variables in your Vercel project settings:
+- `GEMINI_API_KEY`: Your Google Gemini API key
+
+## Local Development
+
+To run the application locally:
+
+```
+python app.py
+```
+
+## Troubleshooting
+
+If you encounter deployment issues:
+
+1. Make sure your dependencies are correctly listed in `requirements.txt`
+2. Check that all required environment variables are set in Vercel
+3. Review the Vercel logs for specific error messages
 
 ## Usage
 
